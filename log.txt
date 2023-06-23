@@ -1,0 +1,325 @@
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 197ce1ce-2f4a-4476-9b52-ae277bc125cb start method GET path /user/ body b''
+INFO:root:request id 197ce1ce-2f4a-4476-9b52-ae277bc125cb begin to list user
+INFO:root:request id 197ce1ce-2f4a-4476-9b52-ae277bc125cb end to list user
+INFO:root:request id 197ce1ce-2f4a-4476-9b52-ae277bc125cb end request
+
+INFO:root:request id f3e115e3-6c4a-451e-8122-113ae5c68c7b start method GET path /user/ body b''
+INFO:root:request id 0a03d280-948b-4cb6-9d0b-7726477c162b start method GET path /detection?query=1 body b'{\r\n    "use" : 123\r\n}'
+INFO:root:request id f3e115e3-6c4a-451e-8122-113ae5c68c7b begin to list user
+INFO:root:request id f3e115e3-6c4a-451e-8122-113ae5c68c7b end to list user
+INFO:root:request id f3e115e3-6c4a-451e-8122-113ae5c68c7b end request
+
+INFO:root:request id 0a03d280-948b-4cb6-9d0b-7726477c162b end request
+
+WARNING:django.request:Not Found: /detection
+INFO:root:request id 207fbaf4-9ae3-4c34-a44b-bcba9a3eebc1 start method GET path /user/ body b''
+INFO:root:request id 207fbaf4-9ae3-4c34-a44b-bcba9a3eebc1 begin to list user
+INFO:root:request id 207fbaf4-9ae3-4c34-a44b-bcba9a3eebc1 end to list user
+INFO:root:request id 207fbaf4-9ae3-4c34-a44b-bcba9a3eebc1 end request
+
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id b1ee06e2-ceeb-4139-826f-854326e05c22 start method GET path /docs/ body b''
+INFO:root:request id b1ee06e2-ceeb-4139-826f-854326e05c22 end request
+
+INFO:root:request id 6edfcad3-0daa-4da7-8251-6f88c5bd0fb0 start method GET path /docs/?format=openapi body b''
+INFO:root:request id 6edfcad3-0daa-4da7-8251-6f88c5bd0fb0 end request
+
+INFO:root:request id 7c903c1f-39c6-4fbd-99e0-f0a825bc3042 start method PUT path /time-tracking/bulk-update/ body b'{\n  "release": "string",\n  "task_id": "string",\n  "task_link": "string",\n  "start_time": "2023-06-23T11:10:54.788Z",\n  "end_time": "2023-06-23T11:10:54.788Z",\n  "status": "TODO",\n  "note": "string",\n  "created_by": "3fa85f64-5717-4562-b3fc-2c963f66afa6",\n  "updated_by": "3fa85f64-5717-4562-b3fc-2c963f66afa6",\n  "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"\n}'
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 511, in dispatch
+    self.response = self.finalize_response(request, response, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 423, in finalize_response
+    assert isinstance(response, HttpResponseBase), (
+AssertionError: Expected a `Response`, `HttpResponse` or `HttpStreamingResponse` to be returned from the view, but received a `<class 'NoneType'>`
+INFO:root:request id 7c903c1f-39c6-4fbd-99e0-f0a825bc3042 end request
+
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id b2da50c8-a14d-4f97-88cd-93e27b80e154 start method PUT path /time-tracking/bulk-update/ body b'{\n  "release": "string",\n  "task_id": "string",\n  "task_link": "string",\n  "start_time": "2023-06-23T11:10:54.788Z",\n  "end_time": "2023-06-23T11:10:54.788Z",\n  "status": "TODO",\n  "note": "string",\n  "created_by": "3fa85f64-5717-4562-b3fc-2c963f66afa6",\n  "updated_by": "3fa85f64-5717-4562-b3fc-2c963f66afa6",\n  "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6"\n}'
+INFO:root:request id b2da50c8-a14d-4f97-88cd-93e27b80e154 end request
+
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id c0b5280b-031f-4125-be50-b7f4683a627c start method GET path /time-tracking/ body b''
+INFO:root:request id c0b5280b-031f-4125-be50-b7f4683a627c end request
+
+INFO:root:request id e91e15db-9009-4781-a239-ac93cf044a75 start method GET path /time-tracking/bulk-update body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+INFO:root:request id e91e15db-9009-4781-a239-ac93cf044a75 end request
+
+INFO:root:request id 87e9914c-0636-4716-978a-608ce8c4b8cd start method GET path /time-tracking/bulk-update/ body b''
+INFO:root:request id 87e9914c-0636-4716-978a-608ce8c4b8cd end request
+
+WARNING:django.request:Method Not Allowed: /time-tracking/bulk-update/
+INFO:root:request id 6a4bbcdc-b7a6-4289-80de-881f2f80753f start method PUT path /time-tracking/bulk-update body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+INFO:root:request id 6a4bbcdc-b7a6-4289-80de-881f2f80753f end request
+
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\utils\deprecation.py", line 136, in __call__
+    response = self.process_response(request, response)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\middleware\common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via PUT, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining PUT data. Change your form to point to 127.0.0.1:8000/time-tracking/bulk-update/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+INFO:root:request id ca540983-7596-4ce3-a9ea-ba56bc346b18 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+INFO:root:request id ca540983-7596-4ce3-a9ea-ba56bc346b18 end request
+
+WARNING:django.request:Unsupported Media Type: /time-tracking/bulk-update/
+INFO:root:request id a531fa48-723f-46ee-9f53-caed5c7a0655 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+INFO:root:request id a531fa48-723f-46ee-9f53-caed5c7a0655 end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id e57b6d80-e170-4efe-91d2-9b88f69cde3f start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 40, in bulk_update
+    queryset.bulk_update(instance, data.keys())
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 851, in bulk_update
+    objs = tuple(objs)
+TypeError: 'TimeTracking' object is not iterable
+INFO:root:request id e57b6d80-e170-4efe-91d2-9b88f69cde3f end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 8f33f2a6-8d06-4a9a-a17a-833c59adf937 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 40, in bulk_update
+    queryset.bulk_update(instance_list, data.keys())
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\db\models\query.py", line 858, in bulk_update
+    raise ValueError("bulk_update() cannot be used with primary key fields.")
+ValueError: bulk_update() cannot be used with primary key fields.
+INFO:root:request id 8f33f2a6-8d06-4a9a-a17a-833c59adf937 end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 515810a8-aa47-4523-85be-49f980b1957a start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 43, in bulk_update
+    queryset.bulk_update(instance_list, field_names.pop('id'))
+AttributeError: 'dict_keys' object has no attribute 'pop'
+INFO:root:request id 515810a8-aa47-4523-85be-49f980b1957a end request
+
+INFO:root:request id b376c34d-e45d-4ddb-bbb7-5d38a8ef2a3e start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 43, in bulk_update
+    queryset.bulk_update(instance_list, field_names.pop('id'))
+AttributeError: 'dict_keys' object has no attribute 'pop'
+INFO:root:request id b376c34d-e45d-4ddb-bbb7-5d38a8ef2a3e end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 4f5d4358-075d-47b2-86e6-f2d773cbcf46 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 42, in bulk_update
+    field_names = lsit(data.keys())
+NameError: name 'lsit' is not defined
+INFO:root:request id 4f5d4358-075d-47b2-86e6-f2d773cbcf46 end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 1c10ba45-e4ee-4925-844c-9286bd4c2363 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 43, in bulk_update
+    queryset.bulk_update(instance_list, field_names.pop('id'))
+TypeError: 'str' object cannot be interpreted as an integer
+INFO:root:request id 1c10ba45-e4ee-4925-844c-9286bd4c2363 end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 981c7f91-765c-45e7-8004-3d0647c2d32a start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 42, in bulk_update
+    field_names = list(data.keys()).pop('id')
+TypeError: 'str' object cannot be interpreted as an integer
+INFO:root:request id 981c7f91-765c-45e7-8004-3d0647c2d32a end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 8a91325b-08cc-429d-ac7a-e20fc94d4cc5 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\views\decorators\csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\viewsets.py", line 125, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "D:\project\tracking_app\trackingapp\baseapp\views.py", line 42, in bulk_update
+    field_names = list(data.keys()).pop('id')
+TypeError: 'str' object cannot be interpreted as an integer
+INFO:root:request id 8a91325b-08cc-429d-ac7a-e20fc94d4cc5 end request
+
+INFO:django.utils.autoreload:D:\project\tracking_app\trackingapp\baseapp\views.py changed, reloading.
+INFO:django.utils.autoreload:Watching for file changes with StatReloader
+INFO:root:request id 48c9a02a-0fcb-427e-af6d-7c433802d065 start method PUT path /time-tracking/bulk-update/ body b'[\r\n    {\r\n        "id" : "1420faa9-8af8-496f-be90-d3396f5d2691", \r\n        "task_id" : "string123"\r\n    }\r\n]'
+ERROR:django.request:Internal Server Error: /time-tracking/bulk-update/
+Traceback (most recent call last):
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\response.py", line 70, in rendered_content
+    ret = renderer.render(self.data, accepted_media_type, context)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\renderers.py", line 99, in render
+    ret = json.dumps(
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\utils\json.py", line 25, in dumps
+    return json.dumps(*args, **kwargs)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\json\encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\json\encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\site-packages\rest_framework\utils\encoders.py", line 67, in default
+    return super().default(obj)
+  File "C:\Users\Admin\AppData\Local\Programs\Python\Python310\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type TimeTracking is not JSON serializable
+INFO:root:request id 48c9a02a-0fcb-427e-af6d-7c433802d065 end request
+
+INFO:root:request id 71b8176b-978c-468e-9efb-8828a5f55744 start method GET path /time-tracking/ body b''
+INFO:root:request id 71b8176b-978c-468e-9efb-8828a5f55744 end request
+

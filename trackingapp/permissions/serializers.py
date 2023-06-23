@@ -3,6 +3,7 @@ from .models import Role, Permission
 from django.db import connection, reset_queries
 from user.models import User
 from baseapp.serializers import AutoAddCreateBySerializer, BulkSerializer
+from functools import reduce
 
 
 class PostRoleSerializer(AutoAddCreateBySerializer):
@@ -10,46 +11,44 @@ class PostRoleSerializer(AutoAddCreateBySerializer):
     class Meta:
         model = Role
         fields = ['id', 'created_by', 'updated_by',
-                  'friendly_name', 'code_name', 'user']
-        extra_kwargs = {"user": {"required": False}}
+                  'friendly_name', 'code_name', 'permission']
 
-    # def create(self, data):
-    #     reset_queries()
-    #     users = data.pop('user')
-    #     instance = self.Meta.model.objects.create(**data)
-    #     print(connection.queries)
-    #     instance.created_by = self.context.get('request').user
+    def validate_permission(self, permission):
+        error_ids = []
+        permission_set = set()
+        for perm in permission:
+            if perm in permission_set:
+                error_ids.append(f'Role id {perm.id} duplicate')
+            permission_set.add(perm)
+        if self.instance:
+            permission_old_ids = self.instance.permission.all().values_list('id', flat=True)
 
-    #     if users :
-    #         for user in users :
-    #             instance.user.add(user)
-    #     print(connection.queries)
-    #     instance.save()
-    #     return instance
-
-    def validate_user(self, users):
-        lst_invalid = []
-        for user in users:
-            if not user.is_active:
-                lst_invalid.append("{} is not active".format(user.id))
-        if lst_invalid:
-            raise serializers.ValidationError(lst_invalid)
-        return users
-
+            error_ids = error_ids + reduce(lambda prev, curr: prev + [
+                                           f'Permission id {curr.id} have already exisited.'] 
+                                           if curr.id in permission_old_ids else prev, permission_set, [])
+        if error_ids:
+            raise serializers.ValidationError(error_ids)
+        return permission
+    
+    def update(self, instance, data):
+        if 'permission' in data.keys():
+            data['permission'] = reduce(lambda prev, curr : prev + [curr], instance.permission.all(), data['permission'])
+        return super().update(instance, data)
 
 class GetRoleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Role
         fields = '__all__'
-        
+
 
 class BulkDeteleRoleSerializer(BulkSerializer):
-    
-    class Meta : 
-        model = Role 
+
+    class Meta:
+        model = Role
         fields = ['ids']
-        
+
+
 class PostPermissionSerializer(AutoAddCreateBySerializer):
 
     class Meta:
@@ -66,7 +65,7 @@ class GetPermissionSerializer(serializers.ModelSerializer):
 
 
 class BulkDetelePermissionSerializer(BulkSerializer):
-    
-    class Meta : 
+
+    class Meta:
         model = Permission
         fields = ['ids']

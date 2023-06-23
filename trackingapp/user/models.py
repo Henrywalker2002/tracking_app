@@ -12,6 +12,7 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     create_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    roles = models.ManyToManyField(to = "permissions.Role")
     
     @property
     def full_name(self):

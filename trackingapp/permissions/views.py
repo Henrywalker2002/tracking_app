@@ -12,14 +12,14 @@ import logging
 
 class RoleModelViewSet(CustomModelViewSetBase):
 
-    serializer_class = {"create": PostRoleSerializer, "update": PostRoleSerializer,
+    serializer_class = {"create": PostRoleSerializer, "update": PostRoleSerializer, "partial_update" : PostRoleSerializer,
                         "bulk_update": PostRoleSerializer, "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
     queryset = Role.objects.all()
     permission_classes = [CustomPermission]
 
 
 class PermissionModelViewSet(CustomModelViewSetBase):
-    serializer_class = {"create": PostPermissionSerializer, "update": PostPermissionSerializer,
+    serializer_class = {"create": PostPermissionSerializer, "update": PostPermissionSerializer, "partial_update" : PostPermissionSerializer,
                         "bulk_delete": BulkDetelePermissionSerializer, "default": GetPermissionSerializer}
     queryset = Permission.objects.all()
     permission_classes = [CustomPermission]

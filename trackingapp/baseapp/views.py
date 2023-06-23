@@ -22,13 +22,28 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         
     @action(methods= ['delete'], detail= False, url_path= 'bulk-delete')
     def bulk_delete(self, request, *args, **kwargs):
-        logging.info('{} begin to bulk_delete function'.format(request.content_params.get('id')))
         queryset = self.get_queryset()
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
         queryset.filter(id__in = serializer.data['ids']).delete()
-        logging.info('{} end bulk_delete function'.format(request.content_params.get('id')))
         return Response(status= status.HTTP_204_NO_CONTENT)
+    
+    @action(methods= ['PUT'], detail= False, url_path= 'bulk-update')
+    def bulk_update(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        instance_list = []
+        for data in request.data: 
+            instance = queryset.get(id = data['id'])
+            for key in data.keys():
+                if key == 'id' : 
+                    continue
+                setattr(instance, key, data[key])
+                instance_list.append(instance)
+        field_names = list(data.keys())
+        field_names.remove('id')
+        queryset.bulk_update(instance_list, field_names)
+        # have not fixed instance return 
+        return Response(status=status.HTTP_200_OK)
         
 
     
