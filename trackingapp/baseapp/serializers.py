@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import BaseModel
 import logging
 
-class AutoAddCreateBySerializer(serializers.ModelSerializer):
+class AutoAddUpdateBySerializer(serializers.ModelSerializer):
     """
     Auto add update_by serializers 
     """
@@ -13,7 +13,7 @@ class AutoAddCreateBySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-class BulkSerializer(serializers.ModelSerializer):
+class BulkDeleteSerializer(serializers.ModelSerializer):
     """
     Serilizer for bulk delete and bulk edit, validate ids. 
     Must have class Meta have fields = ['ids']

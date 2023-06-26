@@ -23,3 +23,12 @@ class PermissionModelViewSet(CustomModelViewSetBase):
                         "bulk_delete": BulkDetelePermissionSerializer, "default": GetPermissionSerializer}
     queryset = Permission.objects.all()
     permission_classes = [CustomPermission]
+
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)

@@ -1,4 +1,4 @@
-from .serializers import PostUserModelSerializer, GetUserModelSerializer, LoginSerializer
+from .serializers import WriteUserModelSerializer, GetUserModelSerializer, LoginSerializer, UpdateRolesSerializer
 from .models import User
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -11,12 +11,17 @@ from baseapp.permission import CustomPermission
 import logging
 from trackingapp.custom_middleware import get_current_request_id
 
+
 class UserModelViewSet(CustomModelViewSetBase):
-    serializer_class = {"create": PostUserModelSerializer, "update": PostUserModelSerializer,
-                        "partial_update": PostUserModelSerializer, "default": GetUserModelSerializer}
+    serializer_class = {"create": WriteUserModelSerializer, "update": WriteUserModelSerializer,
+                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer, "default": GetUserModelSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
-    
+
+    @action(methods=['patch', 'put'], detail=True, url_path="update-role")
+    def update_role(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
     def list(self, request, *args, **kwargs):
         id = get_current_request_id()
         logging.info(f'request id {id} begin to list user')
@@ -24,8 +29,9 @@ class UserModelViewSet(CustomModelViewSetBase):
         logging.info(f'request id {id} end to list user')
         return instance_list
 
+
 class AuthenicationViewSet(CustomModelViewSetBase):
-    serializer_class = {"login": LoginSerializer, "default" : LoginSerializer}
+    serializer_class = {"login": LoginSerializer, "default": LoginSerializer}
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
@@ -37,7 +43,7 @@ class AuthenicationViewSet(CustomModelViewSetBase):
     def login(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not User.objects.filter(email =serializer.validated_data['email']).get().is_active:
+        if not User.objects.filter(email=serializer.validated_data['email']).get().is_active:
             return Response("user is not active")
         user = authenticate(
             request, username=serializer.validated_data['email'], password=serializer.validated_data['password'])

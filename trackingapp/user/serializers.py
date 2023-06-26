@@ -9,15 +9,26 @@ import logging
 from trackingapp.custom_middleware import get_current_request_id
 
 
-class PostUserModelSerializer(serializers.ModelSerializer):
+class WriteUserModelSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['id', 'email', 'password',
-                  'first_name', 'last_name', 'phone', 'roles']
-        extra_kwargs = {"roles": {"required": False}}
+                  'first_name', 'last_name', 'phone']
+
+    def validate_phone(self, phone):
+        regex_phone = "^(0|\+84)\d{9}$"
+        if not re.match(regex_phone, phone):
+            raise serializers.ValidationError("wrong format phone number")
+        return phone
+    
+class UpdateRolesSerializer(serializers.ModelSerializer):
+
+    class Meta :
+        model = User 
+        fields = ['id' , 'roles']
 
     def validate_roles(self, roles):
         error_ids = []
@@ -40,13 +51,6 @@ class PostUserModelSerializer(serializers.ModelSerializer):
             data['roles'] = reduce(lambda prev, curr : prev + [curr], instance.roles.all(), data['roles'])
         instance = super().update(instance, data)
         return instance
-
-    def validate_phone(self, phone):
-        regex_phone = "^(0|\+84)\d{9}$"
-        if not re.match(regex_phone, phone):
-            raise serializers.ValidationError("wrong format phone number")
-        return phone
-
 
 class GetUserModelSerializer(serializers.ModelSerializer):
 

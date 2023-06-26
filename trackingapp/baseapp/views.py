@@ -33,8 +33,10 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         instance_list = []
         for data in request.data: 
-            instance = queryset.get(id = data['id'])
+            instance = queryset.get(id = data.get('id'))
+            #update fields 
             for key in data.keys():
+                # skip id 
                 if key == 'id' : 
                     continue
                 setattr(instance, key, data[key])
@@ -42,8 +44,6 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         field_names = list(data.keys())
         field_names.remove('id')
         queryset.bulk_update(instance_list, field_names)
-        # have not fixed instance return 
-        return Response(status=status.HTTP_200_OK)
-        
-
+        serializer = self.get_serializer(instance_list, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
