@@ -62,5 +62,15 @@ class GetUserModelSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
 
-    email = serializers.EmailField(max_length=128, write_only=True)
+    email = serializers.EmailField(max_length=128)
     password = serializers.CharField(max_length=128, write_only=True)
+    first_name = serializers.CharField(max_length = 128, read_only= True)
+    last_name = serializers.CharField(max_length = 128, read_only= True)
+    phone = serializers.CharField(max_length = 12, read_only= True)
+    full_name = serializers.ReadOnlyField()
+    permission_code_names = serializers.ReadOnlyField()
+    role_names = serializers.ReadOnlyField()
+    
+    class Meta:
+        Model = User
+        fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'phone', 'permission_code_names', 'role_names']

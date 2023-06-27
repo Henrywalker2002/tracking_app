@@ -17,7 +17,9 @@ class BaseModel(models.Model):
     updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="%(class)s_updated_by", null= True)
 
-    
     class Meta: 
         abstract = True
     
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.updated_by = get_current_user()
+        return super().save(force_insert, force_update, using, update_fields)

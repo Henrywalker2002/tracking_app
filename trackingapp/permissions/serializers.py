@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Role, Permission
 from django.db import connection, reset_queries
 from user.models import User
-from baseapp.serializers import AutoAddUpdateBySerializer, BulkDeleteSerializer
+from baseapp.serializers import AutoAddUpdateBySerializer, BulkDeleteSerializer, BulkUpdateSerializer
 from functools import reduce
 
 
@@ -69,3 +69,9 @@ class BulkDetelePermissionSerializer(BulkDeleteSerializer):
     class Meta:
         model = Permission
         fields = ['ids']
+
+class BulkEditPermissionSerializer(BulkUpdateSerializer):
+    
+    class Meta: 
+        model = Permission
+        fields = ['objects']

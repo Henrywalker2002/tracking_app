@@ -6,7 +6,7 @@ import logging
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
     custom get serializer class to get serializer class base on dict 
-    Add action bulk detele
+    Add action bulk detele, bulk edit
     """
     serializer_class = {}
     def get_serializer_class(self):
@@ -30,20 +30,19 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
     
     @action(methods= ['PUT'], detail= False, url_path= 'bulk-update')
     def bulk_update(self, request, *args, **kwargs):
+        # validate ids
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
         queryset = self.get_queryset()
+        serializer_lst = []
         instance_list = []
-        for data in request.data: 
-            instance = queryset.get(id = data.get('id'))
-            #update fields 
-            for key in data.keys():
-                # skip id 
-                if key == 'id' : 
-                    continue
-                setattr(instance, key, data[key])
-                instance_list.append(instance)
-        field_names = list(data.keys())
-        field_names.remove('id')
-        queryset.bulk_update(instance_list, field_names)
-        serializer = self.get_serializer(instance_list, many = True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        for data in request.data.get('objects'): 
+            instance = queryset.get(id = data.pop('id'))
+            # validate objects
+            serializer = self.__class__.serializer_class.get('update')(instance, data = data,  partial = True)
+            serializer.is_valid(raise_exception = True)
+            serializer.context.setdefault('request', request)
+            serializer.save()
+            serializer_lst.append(serializer.data)
+        return Response(serializer_lst, status=status.HTTP_200_OK)
     

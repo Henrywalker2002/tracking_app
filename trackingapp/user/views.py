@@ -1,5 +1,5 @@
 from .serializers import WriteUserModelSerializer, GetUserModelSerializer, LoginSerializer, UpdateRolesSerializer
-from .models import User
+from .models import User, AppUser
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -10,6 +10,18 @@ from baseapp.views import CustomModelViewSetBase
 from baseapp.permission import CustomPermission
 import logging
 from trackingapp.custom_middleware import get_current_request_id
+from functools import reduce
+
+
+# def authenticate(email, password):
+#     user = User.objects.filter(email=email)[0]
+#     if user.check_password(password):
+#         permission_lst = []
+#         permission_lst = reduce(lambda prev, curr: prev + list(curr.permission.all(
+#             ).values_list('code_name', flat=True)), user.roles.all(), permission_lst)
+#         instance = AppUser(user.id, user.email, user.phone, permission_lst, user.is_active)
+#         return instance
+#     return None
 
 
 class UserModelViewSet(CustomModelViewSetBase):
@@ -29,6 +41,13 @@ class UserModelViewSet(CustomModelViewSetBase):
         logging.info(f'request id {id} end to list user')
         return instance_list
 
+    @action(detail=True, url_path="get-role")
+    def get_role(self, request, pk):
+        instance = User.objects.prefetch_related('roles')
+        roles_name = reduce(lambda prev, curr: prev + list(curr.roles.all().values_list(
+            'friendly_name', flat=True)), instance.filter(id=pk), [])
+        return Response(roles_name)
+
 
 class AuthenicationViewSet(CustomModelViewSetBase):
     serializer_class = {"login": LoginSerializer, "default": LoginSerializer}
@@ -43,13 +62,15 @@ class AuthenicationViewSet(CustomModelViewSetBase):
     def login(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not User.objects.filter(email=serializer.validated_data['email']).get().is_active:
-            return Response("user is not active")
         user = authenticate(
             request, username=serializer.validated_data['email'], password=serializer.validated_data['password'])
+        # user = authenticate(serializer.validated_data['email'], serializer.validated_data['password'])
         if user:
+            if not user.is_active:
+                return Response("user is not active")
+            setattr(user, 'test', 'test')
             login(request, user)
-            return Response("success")
+            return Response(self.get_serializer(user).data)
         return Response("wrong username or password")
 
     @action(methods=['post'], detail=False, url_path="logout")
