@@ -1,5 +1,5 @@
 from django.db import models
-from baseapp.models import BaseModel
+from base.models import BaseModel
 
 
 class Permission(BaseModel):

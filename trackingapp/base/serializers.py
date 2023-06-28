@@ -37,8 +37,6 @@ class BulkDeleteSerializer(serializers.ModelSerializer):
     
 class BulkUpdateSerializer(serializers.ModelSerializer):
     
-    objects = serializers.ListField()
-    
     def validate_objects(self, objects):
         exist_ids = self.Meta.model.objects.all().values_list('id', flat = True)
         error_lst = []

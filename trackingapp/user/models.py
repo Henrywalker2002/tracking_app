@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from functools import reduce
 
 
-class AppUser(AbstractBaseUser):
+class AppUser:
     id = models.UUIDField(primary_key= True)
     def __init__(self, id, email, phone, permissions, is_active):
         self.id = id
@@ -15,7 +15,6 @@ class AppUser(AbstractBaseUser):
 
     class Meta:
         abstract = True
-
 
 
 class User(AbstractBaseUser):

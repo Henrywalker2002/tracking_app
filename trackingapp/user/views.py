@@ -6,29 +6,20 @@ from rest_framework.decorators import action
 from rest_framework.authentication import authenticate
 from rest_framework import status
 from django.contrib.auth import login, logout
-from baseapp.views import CustomModelViewSetBase
-from baseapp.permission import CustomPermission
+from base.views import CustomModelViewSetBase
+from base.permission import CustomPermission
 import logging
 from trackingapp.custom_middleware import get_current_request_id
 from functools import reduce
-
-
-# def authenticate(email, password):
-#     user = User.objects.filter(email=email)[0]
-#     if user.check_password(password):
-#         permission_lst = []
-#         permission_lst = reduce(lambda prev, curr: prev + list(curr.permission.all(
-#             ).values_list('code_name', flat=True)), user.roles.all(), permission_lst)
-#         instance = AppUser(user.id, user.email, user.phone, permission_lst, user.is_active)
-#         return instance
-#     return None
-
+from base.authentication import CustomAuthentication
 
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": WriteUserModelSerializer, "update": WriteUserModelSerializer,
-                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer, "default": GetUserModelSerializer}
+                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer, 
+                        "default": GetUserModelSerializer, "bulk_create" : WriteUserModelSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
+    authentication_classes = [CustomAuthentication]
 
     @action(methods=['patch', 'put'], detail=True, url_path="update-role")
     def update_role(self, request, *args, **kwargs):
@@ -68,7 +59,6 @@ class AuthenicationViewSet(CustomModelViewSetBase):
         if user:
             if not user.is_active:
                 return Response("user is not active")
-            setattr(user, 'test', 'test')
             login(request, user)
             return Response(self.get_serializer(user).data)
         return Response("wrong username or password")

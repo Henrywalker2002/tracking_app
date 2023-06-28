@@ -1,9 +1,8 @@
 from rest_framework import serializers
 from .models import TimeTracking
-from baseapp.serializers import AutoAddUpdateBySerializer
 
 
-class PostTimeTrackingSerializer(AutoAddUpdateBySerializer):
+class PostTimeTrackingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimeTracking

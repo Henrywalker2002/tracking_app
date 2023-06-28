@@ -1,6 +1,6 @@
 from django.db import models
 from user.models import User
-from baseapp.models import BaseModel
+from base.models import BaseModel
 from datetime import datetime
 
 class StatusTimeTracking(models.TextChoices):
