@@ -1,13 +1,15 @@
 import uuid 
 import logging
+from threading import local
 
 logging.basicConfig(filename= "log.txt", level= logging.INFO)
-
-from threading import local
 
 _user = local()
 
 class CustomMiddleware:
+    """
+    Add request id and request.user to local
+    """
     def __init__(self, get_response):
         self.get_response = get_response
     

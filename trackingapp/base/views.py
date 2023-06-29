@@ -1,22 +1,11 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.serializers import ValidationError
 import logging
 from functools import reduce
 import uuid
-
-def validate_ids(exist_ids, object_lst):
-    error_lst = []
-    for obj in object_lst:
-        try:
-            id = uuid.UUID(obj.get('id'))
-            if id not in exist_ids:
-                error_lst.append(f"id {id} is not exist")
-        except Exception as e :
-            error_lst.append(f"id {obj.get('id')} is not valid")
-    if error_lst:
-        raise ValidationError(error_lst)
+import datetime
+from django.utils import timezone
 
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
@@ -43,25 +32,28 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         queryset.filter(id__in = serializer.data['ids']).delete()
         return Response(status= status.HTTP_204_NO_CONTENT)
     
-    @action(methods=['PATCH'], detail=False, url_path='bulk-update')
+    @action(methods=['PUT'], detail=False, url_path='bulk-update')
     def bulk_update(self, request, *args, **kwargs):
         """
         Update field pass by request.body['objects'] + updated_by 
         """
-        validate_ids(list(self.get_queryset().values_list('id', flat = True)), request.data.get('objects'))
         instance_lst = []
-        fields = {'updated_by'}
+        fields = {'updated_by', 'modified_at'}
         updated_instances = []
-        ids = reduce(lambda prev, curr: prev + [curr.get('id')], request.data.get('objects'), [])
+        ids = reduce(lambda prev, curr: prev + [curr.get('id')], request.data, [])
         instances = self.get_queryset().filter(id__in = ids)
-        serializer = self.get_serializer(instances, request.data['objects'], many = True, partial = True)
+        serializer = self.get_serializer(instances, request.data, many = True)
         serializer.is_valid(raise_exception = True)
-        for obj in request.data['objects']:
+        for obj in request.data:
             instance = instances.filter(id = obj.pop('id')).get()
             for key,value in obj.items():
+                # if in 4 field auto add, skip 
+                if key in ['updated_by', 'modified_at', 'created_by', 'created_at']:
+                    continue
                 setattr(instance, key, value)
                 fields.add(key)
             setattr(instance, 'updated_by', self.request.user)
+            setattr(instance, 'modified_at', datetime.datetime.now(tz = timezone.utc))
             instance_lst.append(instance)
         self.get_serializer_class().Meta.model.objects.bulk_update(instance_lst, fields)
         return Response(serializer.data)

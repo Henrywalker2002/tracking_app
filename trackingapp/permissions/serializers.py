@@ -9,7 +9,7 @@ import uuid
 class WriteRoleSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Role
+        model = Role 
         fields = ['id', 'created_by', 'updated_by',
                   'friendly_name', 'code_name', 'permission']
 
@@ -56,10 +56,6 @@ class WritePermissionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {"role": {"required": False}}
         
-    def validate(self, data):
-        id = data.get('id')
-
-        return data
 
 class GetPermissionSerializer(serializers.ModelSerializer):
 
@@ -73,3 +69,9 @@ class BulkDetelePermissionSerializer(BulkDeleteSerializer):
     class Meta:
         model = Permission
         fields = ['ids']
+
+class BulkUpdatePermissionSerializer(BulkUpdateSerializer):
+        
+    class Meta: 
+        model = Permission
+        fields = '__all__'

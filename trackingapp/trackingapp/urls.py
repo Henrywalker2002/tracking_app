@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
 from user.views import AuthenicationViewSet, UserModelViewSet
 from permissions.views import RoleModelViewSet, PermissionModelViewSet 
-from timeTracking.views import TimeTrackingViewSet
+from time_tracking.views import TimeTrackingViewSet
 
 router = DefaultRouter()
 router.register(r'user', UserModelViewSet)

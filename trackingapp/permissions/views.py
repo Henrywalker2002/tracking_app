@@ -1,17 +1,15 @@
 from base.views import CustomModelViewSetBase
 
-from .serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer,
+from .serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer, BulkUpdatePermissionSerializer,
                           GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer)
 from .models import Role, Permission
 from rest_framework import permissions
 from rest_framework.response import Response
 from django.db import connection, reset_queries
-from base.permission import CustomPermission, query_debugger
+from base.permission import CustomPermission
 from rest_framework.decorators import action
-import uuid
 import logging
 from functools import reduce
-from base.permission import query_debugger
 
 class RoleModelViewSet(CustomModelViewSetBase):
 
@@ -22,7 +20,6 @@ class RoleModelViewSet(CustomModelViewSetBase):
     permission_classes = [CustomPermission]
 
     @action(detail=True, url_path='view-permission')
-    @query_debugger
     def view_permission(self, request):
         permission_lst = self.instance.permission.all()
         lst = []
@@ -34,7 +31,7 @@ class RoleModelViewSet(CustomModelViewSetBase):
 class PermissionModelViewSet(CustomModelViewSetBase):
 
     serializer_class = {"create": WritePermissionSerializer, "update": WritePermissionSerializer, "partial_update": WritePermissionSerializer,
-                        "bulk_delete": WritePermissionSerializer, "bulk_update": WritePermissionSerializer, "default": GetPermissionSerializer}
+                        "bulk_delete": WritePermissionSerializer, "bulk_update": BulkUpdatePermissionSerializer, "default": GetPermissionSerializer}
     
     queryset = Permission.objects.all()
     permission_classes = [CustomPermission]

@@ -1,5 +1,6 @@
-from .serializers import WriteUserModelSerializer, GetUserModelSerializer, LoginSerializer, UpdateRolesSerializer
-from .models import User, AppUser
+from .serializers import (WriteUserModelSerializer, GetUserModelSerializer,
+                          LoginSerializer, UpdateRolesSerializer, BulkUpdateUserSerializer)
+from .models import User
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -13,17 +14,23 @@ from trackingapp.custom_middleware import get_current_request_id
 from functools import reduce
 from base.authentication import CustomAuthentication
 
+
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": WriteUserModelSerializer, "update": WriteUserModelSerializer,
-                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer, 
-                        "default": GetUserModelSerializer, "bulk_create" : WriteUserModelSerializer}
+                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer,
+                        "default": GetUserModelSerializer, "bulk_create": WriteUserModelSerializer, 
+                        "bulk_update": BulkUpdateUserSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
     authentication_classes = [CustomAuthentication]
 
-    @action(methods=['patch', 'put'], detail=True, url_path="update-role")
+    @action(methods=['patch'], detail=True, url_path="update-role")
     def update_role(self, request, *args, **kwargs):
+        """
+        Append role to user
+        """
         return super().update(request, *args, **kwargs)
+    
 
     def list(self, request, *args, **kwargs):
         id = get_current_request_id()
@@ -55,7 +62,6 @@ class AuthenicationViewSet(CustomModelViewSetBase):
         serializer.is_valid(raise_exception=True)
         user = authenticate(
             request, username=serializer.validated_data['email'], password=serializer.validated_data['password'])
-        # user = authenticate(serializer.validated_data['email'], serializer.validated_data['password'])
         if user:
             if not user.is_active:
                 return Response("user is not active")
@@ -67,3 +73,5 @@ class AuthenicationViewSet(CustomModelViewSetBase):
     def logout(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    

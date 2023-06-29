@@ -7,7 +7,7 @@ from django.db import transaction
 from functools import reduce
 import logging
 from trackingapp.custom_middleware import get_current_request_id
-
+from base.serializers import BulkUpdateSerializer
 
 class WriteUserModelSerializer(serializers.ModelSerializer):
 
@@ -16,13 +16,18 @@ class WriteUserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'password',
-                  'first_name', 'last_name', 'phone']
+                  'first_name', 'last_name', 'created_at', 'modified_at', 'phone', 'role_names']
 
     def validate_phone(self, phone):
         regex_phone = "^(0|\+84)\d{9}$"
         if not re.match(regex_phone, phone):
             raise serializers.ValidationError("wrong format phone number")
         return phone
+    
+    def validate_password(self, password):
+        if len(password) < 8:
+            raise serializers.ValidationError('password must have at least 8 characters')
+        return password
     
 class UpdateRolesSerializer(serializers.ModelSerializer):
 
@@ -59,9 +64,17 @@ class GetUserModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name',
                   'last_name', 'full_name', 'phone', "roles"]
 
+class BulkUpdateUserSerializer(BulkUpdateSerializer):
+    
+    password = serializers.CharField(write_only= True)
+    
+    class Meta: 
+        model = User
+        fields = '__all__' 
 
 class LoginSerializer(serializers.Serializer):
-
+    
+    id = serializers.ReadOnlyField()
     email = serializers.EmailField(max_length=128)
     password = serializers.CharField(max_length=128, write_only=True)
     first_name = serializers.CharField(max_length = 128, read_only= True)
@@ -74,3 +87,4 @@ class LoginSerializer(serializers.Serializer):
     class Meta:
         Model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'phone', 'permission_code_names', 'role_names']
+        

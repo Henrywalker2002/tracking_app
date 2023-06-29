@@ -3,17 +3,6 @@ from .models import BaseModel
 import uuid
 import logging
 
-class AutoAddUpdateBySerializer(serializers.ModelSerializer):
-    """
-    Auto add update_by serializers 
-    """
-    # def update(self, instance, data):
-    #     instance = super().update(instance, data)
-    #     instance.updated_by = self.context.get('request').user 
-    #     instance.save()
-    #     return instance
-    pass 
-
 class BulkDeleteSerializer(serializers.ModelSerializer):
     """
     Serilizer for bulk delete and bulk edit, validate ids. 
@@ -36,20 +25,16 @@ class BulkDeleteSerializer(serializers.ModelSerializer):
         return ids
     
 class BulkUpdateSerializer(serializers.ModelSerializer):
+    """
+    Only vadidate id in list object, must add class Meta to use it 
+    """
+    id = serializers.UUIDField()
     
-    def validate_objects(self, objects):
-        exist_ids = self.Meta.model.objects.all().values_list('id', flat = True)
-        error_lst = []
-        for obj in objects:
-            if not (isinstance(obj, dict) and obj.get('id')):
-                error_lst.append(f'{obj} is not valid')
-            try : 
-                id = uuid.UUID(obj.get('id')) 
-            except Exception as e :
-                error_lst.append(f"id {obj.get('id')} is not valid")
-                continue
-            if id not in exist_ids:
-                error_lst.append(f"id {obj.get('id')} is not valid")
-        if error_lst:
-            raise serializers.ValidationError(error_lst)
-        return objects
+    def validate_id(self, id):
+        try :
+            count = len(self.Meta.model.objects.filter(id = id))
+            if not count:
+                raise serializers.ValidationError(f'id {id} is not exist')
+        except Exception as e:
+            raise serializers.ValidationError(f'id {id} is not valid')
+        return id
