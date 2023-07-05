@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'drf_yasg',
     'user.apps.UserConfig', 
     'permissions',
-    'time_tracking'
+    'time_tracking',
+    'notification',
+    'media'
 ]
 
 MIDDLEWARE = [
@@ -128,7 +130,7 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny' , ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+        'base.authentication.CustomAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', 
     'PAGE_SIZE' : 100,

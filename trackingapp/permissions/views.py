@@ -1,7 +1,6 @@
-from base.views import CustomModelViewSetBase
-
-from .serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer, BulkUpdatePermissionSerializer,
-                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer)
+from base.views import BulkActionBaseModelViewSet
+from permissions.serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer, BulkUpdatePermissionSerializer,
+                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer, BulkUpdateRoleSerializer)
 from .models import Role, Permission
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -11,10 +10,10 @@ from rest_framework.decorators import action
 import logging
 from functools import reduce
 
-class RoleModelViewSet(CustomModelViewSetBase):
+class RoleModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WriteRoleSerializer, "update": WriteRoleSerializer, "partial_update": WriteRoleSerializer,
-                        "bulk_update": WriteRoleSerializer, "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
+                        "bulk_update": BulkUpdateRoleSerializer, "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
 
     queryset = Role.objects.all()
     permission_classes = [CustomPermission]
@@ -28,7 +27,7 @@ class RoleModelViewSet(CustomModelViewSetBase):
         return Response(lst)
 
 
-class PermissionModelViewSet(CustomModelViewSetBase):
+class PermissionModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WritePermissionSerializer, "update": WritePermissionSerializer, "partial_update": WritePermissionSerializer,
                         "bulk_delete": WritePermissionSerializer, "bulk_update": BulkUpdatePermissionSerializer, "default": GetPermissionSerializer}

@@ -58,16 +58,30 @@ class TestUser(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         created_at = parser.parse(json.get('created_at'))
         self.assertEqual(created_at, self.now)
-        self.assertEqual(len(json), 7)
+        self.assertEqual(len(json), 8)
     
-    def test_update_user(self):
+    @patch('user.views.UserModelViewSet.check_permissions', return_value = True)
+    def test_update_user(self, mock):
         user = User.objects.get(email = "user@example.com")
         data = {
-            "name": "name"
+            "first_name": "name"
         }
         response = self.client.patch(f'{self.url}{user.id}/', data = data, format = 'json')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get('name'), 'name')
+        self.assertEqual(response.json().get('first_name'), 'name')
+    
+    @patch('user.views.UserModelViewSet.check_permissions', return_value = True)
+    def test_delete_user(self, mock):
+        response = self.client.delete(f'{self.url}{123}/', data = {}, format = 'json')
+        self.assertEqual(response.status_code, 404)
+        
+    @patch('user.views.UserModelViewSet.check_permissions', return_value = True)
+    def test_delete_user_2(self, mock):
+        count = len(User.objects.all())
+        user = User.objects.get(email = "user@example.com")
+        response = self.client.delete(f'{self.url}{user.id}/', data = {}, format = 'json')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(User.objects.all()), count - 1)
     
     def tearDown(self):
         self.client.logout()

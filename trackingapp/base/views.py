@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import serializers
 import logging
 from functools import reduce
 import uuid
@@ -9,8 +10,7 @@ from django.utils import timezone
 
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
-    custom get serializer class to get serializer class base on dict 
-    Add action bulk detele, bulk edit
+    custom get serializer class to get serializer class base on dict only
     """
     serializer_class = {}
     def get_serializer_class(self):
@@ -23,6 +23,31 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         key is action name , value is serializer class. Example : add_serializer_class("create", PostSerializer)
         """
         self.serializer_class.update({key, value})
+        
+class BulkCreateMixin:
+    
+    def _bulk_create(self, data, user = None): 
+        serializer = self.get_serializer(data = data, many = True)
+        serializer.is_valid(raise_exception = True)
+        instance_lst = []
+        for obj in serializer.data:
+            instance = self.get_serializer_class().Meta.model(**obj)
+            if hasattr(instance, 'created_by'):
+                setattr(instance, 'created_by', user)
+            instance_lst.append(instance)
+        self.get_serializer_class().Meta.model.objects.bulk_create(instance_lst)
+        return serializer
+    
+    @action(methods= ['POST'], detail= False , url_path= 'bulk-create')
+    def bulk_create(self, request):
+        serializer = self._bulk_create(request.data, request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin):
+    """
+    Custom get serializer class to get serializer class base on dict 
+    Bulk update, bulk detele, bulk create for perrmision and roles, time tracking
+    """
         
     @action(methods= ['delete'], detail= False, url_path= 'bulk-delete')
     def bulk_delete(self, request, *args, **kwargs):
@@ -39,16 +64,20 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         """
         instance_lst = []
         fields = {'updated_by', 'modified_at'}
-        updated_instances = []
-        ids = reduce(lambda prev, curr: prev + [curr.get('id')], request.data, [])
-        instances = self.get_queryset().filter(id__in = ids)
-        serializer = self.get_serializer(instances, request.data, many = True)
-        serializer.is_valid(raise_exception = True)
+            
         for obj in request.data:
-            instance = instances.filter(id = obj.pop('id')).get()
+            
+            try :
+                instance = self.get_queryset().get(id = obj.get('id'))
+            except Exception as e:
+                raise serializers.ValidationError(f"id {obj.get('id')} is not exist")
+            
+            serializer = self.get_serializer(instance ,data = obj)
+            serializer.is_valid(raise_exception = True)
+            
             for key,value in obj.items():
                 # if in 4 field auto add, skip 
-                if key in ['updated_by', 'modified_at', 'created_by', 'created_at']:
+                if key in ['updated_by', 'modified_at', 'created_by', 'created_at', 'id']:
                     continue
                 setattr(instance, key, value)
                 fields.add(key)
@@ -56,18 +85,8 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
             setattr(instance, 'modified_at', datetime.datetime.now(tz = timezone.utc))
             instance_lst.append(instance)
         self.get_serializer_class().Meta.model.objects.bulk_update(instance_lst, fields)
-        return Response(serializer.data)
+        return_serializer = self.get_serializer(instance_lst, many = True)
+        return Response(return_serializer.data)
     
-    @action(methods= ['POST'], detail= False , url_path= 'bulk-create')
-    def bulk_create(self, request):
-        serializer = self.get_serializer(data = request.data, many = True)
-        serializer.is_valid(raise_exception = True)
-        instance_lst = []
-        for obj in serializer.data:
-            instance = self.get_serializer_class().Meta.model(**obj)
-            if hasattr(instance, created_by):
-                setattr(instance, 'created_by', request.user)
-            instance_lst.append(instance)
-        self.get_serializer_class().Meta.model.objects.bulk_create(instance_lst)
-        return Response(serializer.data)
+
     

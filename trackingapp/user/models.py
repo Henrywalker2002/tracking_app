@@ -25,11 +25,6 @@ class User(AbstractBaseUser):
         return self.first_name + ' ' + self.last_name
 
     @property
-    def permission_code_names(self):
-        user = User.objects.filter(id=self.id).first()
-        return reduce(lambda prev, curr: prev + list(curr.permission.all().values_list('code_name', flat=True)), user.roles.all(), [])
-
-    @property
     def role_names(self):
         user = User.objects.filter(id=self.id).first()
         return list(user.roles.all().values_list('friendly_name', flat=True))
@@ -41,4 +36,5 @@ class User(AbstractBaseUser):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         from permissions.models import Role
         super().save(force_insert, force_update , using, update_fields)
-        self.roles.set([Role.objects.get(code_name= 'user')])
+        if not len(self.roles.all()):
+            self.roles.set([Role.objects.get(code_name= 'user')])

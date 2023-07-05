@@ -1,6 +1,9 @@
 from django.db import connection, reset_queries
 import functools
 import time
+from trackingapp.custom_middleware import get_current_request_id 
+import logging
+import inspect
 
 def query_debugger(func):
     @functools.wraps(func)
@@ -22,3 +25,15 @@ def query_debugger(func):
         return result
 
     return inner_func
+
+def log_debugger(func):
+    @functools.wraps(func)
+    def inner_func(*args, **kawrgs):
+        id = get_current_request_id()
+        logging.info(f'request {id} begin to {func.__name__} param {args} {kawrgs}')
+        result = func(*args, **kawrgs)
+        logging.info(f'request {id} end {func.__name__}')
+        return result
+    
+    return inner_func
+        

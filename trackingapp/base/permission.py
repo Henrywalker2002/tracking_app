@@ -8,6 +8,7 @@ class CustomPermission(BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
+        # perm_lst get from authenticate of custom authentication
         permission_lst = request.user.permission_code_names
         
         for perm in permission_lst:

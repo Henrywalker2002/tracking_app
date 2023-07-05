@@ -31,22 +31,25 @@ class WriteUserModelSerializer(serializers.ModelSerializer):
     
 class UpdateRolesSerializer(serializers.ModelSerializer):
 
+    email = serializers.EmailField(read_only= True)
+    
     class Meta :
         model = User 
-        fields = ['id' , 'roles']
+        fields = ['id', 'email' , 'roles', 'role_names']
+        extra_kwargs = {"roles" : {"write_only" : True}}
 
     def validate_roles(self, roles):
         error_ids = []
         roles_set = set()
         for role in roles :
             if role in roles_set:
-                error_ids.append(f'Role id {role.id} duplicate')
+                error_ids.append(f'Role {role.code_name} - id {role.id} duplicate')
             roles_set.add(role)
         if self.instance:
             old_roles_ids = self.instance.roles.all().values_list('id', flat=True)
 
             error_ids = error_ids + reduce(lambda prev, curr: prev + [
-                            f'Role id {curr.id} have already exisited.'] if curr.id in old_roles_ids else prev, roles_set, [])
+                f'Role {role.friendly_name} - id: {curr.id} have already exisited.'] if curr.id in old_roles_ids else prev, roles_set, [])
         if error_ids:
             raise serializers.ValidationError(error_ids)
         return roles
@@ -57,12 +60,35 @@ class UpdateRolesSerializer(serializers.ModelSerializer):
         instance = super().update(instance, data)
         return instance
 
+class DeleteRolesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'roles')
+    
+    def validate_roles(self, roles):
+        error_ids = []
+        roles_set = set()
+        for role in roles :
+            if role in roles_set:
+                error_ids.append(f'Role {role.friendly_name} - id {role.id} duplicate')
+            roles_set.add(role)
+        if error_ids:
+            raise serializers.ValidationError(error_ids)
+        if self.instance:
+            old_roles_ids = self.instance.roles.all().values_list('id', flat=True)
+            
+        error_ids = error_ids + reduce(lambda prev, curr: prev + [
+            f'Role {role.friendly_name} - id {curr.id} have not exisited.'] if curr.id not in old_roles_ids else prev, roles_set, [])
+        if error_ids:
+            raise serializers.ValidationError(error_ids)
+        return roles
+
 class GetUserModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name',
-                  'last_name', 'full_name', 'phone', "roles"]
+                  'last_name', 'full_name', 'phone', "role_names"]
 
 class BulkUpdateUserSerializer(BulkUpdateSerializer):
     
