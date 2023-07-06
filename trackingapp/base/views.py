@@ -2,11 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import serializers
-import logging
 from functools import reduce
-import uuid
+from uuid import UUID
 import datetime
 from django.utils import timezone
+
 
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
@@ -17,17 +17,16 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         if self.action in self.serializer_class.keys():
             return self.serializer_class[self.action]
         return self.serializer_class['default']
-    
-    def add_serilizer_class(self, key: str, value):
-        """
-        key is action name , value is serializer class. Example : add_serializer_class("create", PostSerializer)
-        """
-        self.serializer_class.update({key, value})
         
 class BulkCreateMixin:
     
     def _bulk_create(self, data, user = None): 
-        serializer = self.get_serializer(data = data, many = True)
+
+        return serializer
+    
+    @action(methods= ['POST'], detail= False , url_path= 'bulk-create')
+    def bulk_create(self, request):
+        serializer = self.get_serializer(data = request.data, many = True)
         serializer.is_valid(raise_exception = True)
         instance_lst = []
         for obj in serializer.data:
@@ -36,19 +35,11 @@ class BulkCreateMixin:
                 setattr(instance, 'created_by', user)
             instance_lst.append(instance)
         self.get_serializer_class().Meta.model.objects.bulk_create(instance_lst)
-        return serializer
-    
-    @action(methods= ['POST'], detail= False , url_path= 'bulk-create')
-    def bulk_create(self, request):
-        serializer = self._bulk_create(request.data, request.user)
+        # have not fixed return 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin):
-    """
-    Custom get serializer class to get serializer class base on dict 
-    Bulk update, bulk detele, bulk create for perrmision and roles, time tracking
-    """
-        
+
+class BulkDeleteMixin:
+    
     @action(methods= ['delete'], detail= False, url_path= 'bulk-delete')
     def bulk_delete(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -57,20 +48,22 @@ class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin):
         queryset.filter(id__in = serializer.data['ids']).delete()
         return Response(status= status.HTTP_204_NO_CONTENT)
     
+class BulkUpdateMixin:
+    """
+    Update field pass by request.body['objects'] + updated_by 
+    """    
+    
     @action(methods=['PUT'], detail=False, url_path='bulk-update')
     def bulk_update(self, request, *args, **kwargs):
-        """
-        Update field pass by request.body['objects'] + updated_by 
-        """
         instance_lst = []
         fields = {'updated_by', 'modified_at'}
             
         for obj in request.data:
             
-            try :
-                instance = self.get_queryset().get(id = obj.get('id'))
-            except Exception as e:
+            instance = self.get_queryset().filter(id = obj.get('id'))
+            if not instance:
                 raise serializers.ValidationError(f"id {obj.get('id')} is not exist")
+            instance = instance.get()
             
             serializer = self.get_serializer(instance ,data = obj)
             serializer.is_valid(raise_exception = True)
@@ -87,6 +80,59 @@ class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin):
         self.get_serializer_class().Meta.model.objects.bulk_update(instance_lst, fields)
         return_serializer = self.get_serializer(instance_lst, many = True)
         return Response(return_serializer.data)
+        
+class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkUpdateMixin, BulkDeleteMixin):
+    """
+    Custom get serializer class to get serializer class base on dict 
+    Bulk update, bulk detele, bulk create for perrmision and roles, time tracking
+    """
+    pass 
     
 
+class GetByUserIdMixin: 
+    """
+    have action get by user id 
+    """
+    @action(detail= False, url_path="get-by-user-id")
+    def get_by_user_id(self, request):
+        # if many notification ? 
+        param = request.GET 
+        if not param.get('id'):
+            return Response(data = {"id" : f'must have param query id'}, status= status.HTTP_400_BAD_REQUEST)
+        try: 
+            id = UUID(param.get('id'))
+            instance_lst = self.get_queryset().filter(user_id = id)
+            
+            page = self.paginate_queryset(instance_lst)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(instance_lst, many=True)
+            return Response(serializer.data)
+
+        except ValueError as e:
+            return Response(data={"id": f"id {param.get('id')} is not valid"}, status= status.HTTP_400_BAD_REQUEST)
+
+class GetByTimeTrackingIdMixin:
+    """
+    have action get by time tracking id 
+    """
     
+    @action(detail= False, url_path= "get-by-time-tracking-id")
+    def get_by_time_tracking_id(self, request):
+        param = request.GET
+        try:
+            id = UUID(param.get('id'))
+            instance_lst = self.get_queryset().filter(time_tracking_id=id)
+            
+            page = self.paginate_queryset(instance_lst)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.get_serializer(instance_lst, many=True)
+            return Response(serializer.data)
+        
+        except ValueError as e:
+            return Response(data={"id": f"id {param.get('id')} is not valid"}, status=400)

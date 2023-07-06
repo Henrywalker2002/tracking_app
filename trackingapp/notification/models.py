@@ -1,8 +1,7 @@
 from django.db import models
 from base.models import BaseModel
-from time_tracking.models import Subcriber
 from user.models import User
-
+from django.core.cache import cache
 
 class TypeNotification(models.TextChoices):
     TIME_TRACKING_HISTORY = "TIME_TRACKING_HISTORY", "TIME_TRACKING_HISTORY"
@@ -15,3 +14,7 @@ class Notification(BaseModel):
     type = models.CharField(
         max_length=128, choices=TypeNotification.choices, null=False)
     checked = models.BooleanField(default=False)
+
+    @property
+    def email_user(self):
+        return cache.get(self.user_id) if cache.get(self.user_id) else cache.get_or_set(self.user_id, self.user.email) 

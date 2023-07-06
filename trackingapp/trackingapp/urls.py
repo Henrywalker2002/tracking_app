@@ -6,14 +6,16 @@ from rest_framework.routers import DefaultRouter
 from user.views import AuthenicationViewSet, UserModelViewSet
 from permissions.views import RoleModelViewSet, PermissionModelViewSet 
 from time_tracking.views import TimeTrackingViewSet, HistoryViewOnly, SubcriberModelViewSet
+from notification.views import NotificationViewset
 
 router = DefaultRouter()
 router.register(r'user', UserModelViewSet)
 router.register(r'role', RoleModelViewSet)
 router.register(r'permission', PermissionModelViewSet, basename='permission')
 router.register(r'time-tracking', TimeTrackingViewSet)
-router.register(r'time-tracking-history', HistoryViewOnly)
+router.register(r'time-tracking-history', HistoryViewOnly, basename="history")
 router.register(r'subcriber', SubcriberModelViewSet)
+router.register(r'notification', NotificationViewset)
 
 schema_view = get_schema_view(openapi.Info(
     "docs", default_version= "v1", public=True ))

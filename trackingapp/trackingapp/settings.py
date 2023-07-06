@@ -126,9 +126,10 @@ USE_I18N = True
 USE_TZ = True
 
 
+
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny' , ),
+    'DEFAULT_PERMISSION_CLASSES' : ("base.permission.CustomPermission", ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'base.authentication.CustomAuthentication',
     ],
@@ -147,3 +148,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+        "TIMEOUT": 8*60*60, # 8 HOUR
+        "OPTIONS" : {
+            "MAX_ENTRIES" : 300,
+            "MAX_ENTRIES" : 2
+        }
+    }
+}
