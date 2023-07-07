@@ -35,6 +35,7 @@ class User(AbstractBaseUser):
     @transaction.atomic
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         from permissions.models import Role
+        self.set_password(self.password)
         super().save(force_insert, force_update , using, update_fields)
         if not len(self.roles.all()):
             self.roles.set([Role.objects.get(code_name= 'user')])

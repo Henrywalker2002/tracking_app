@@ -3,37 +3,9 @@ import logging
 import threading
 import functools
 
-from queue import Queue
-
-taskQueue = Queue()
-lock = threading.Lock()
-
 logging.basicConfig(filename="log.txt", level=logging.INFO)
 
 _user = threading.local()
-
-
-def add_to_queue(func):
-    global taskQueue, lock
-    
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        lock.acquire()
-        taskQueue.put((func, args, kwargs))
-        lock.release()
-    return inner
-    
-
-def proccess_task_queue():
-    """
-    element is tuple (func_name, args, kwargs)
-    """
-    global taskQueue
-    lock.acquire()
-    ele = taskQueue.get()
-    lock.release()
-    ele[0](*ele[1], **ele[2])
-    proccess_task_queue()
 
 class CustomMiddleware:
     """
@@ -44,9 +16,6 @@ class CustomMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        
-        thread_process_task = threading.Thread(target= proccess_task_queue, args=(), daemon= True)
-        thread_process_task.start()
         
         if request.user:
             _user.__setattr__('user', request.user)
@@ -69,7 +38,7 @@ def get_current_user():
 
 
 def get_current_request_id():
-    return _user.request_id
+    return getattr(_user, "request_id", None)
 
 
 class CustomThread(threading.Thread):

@@ -63,10 +63,8 @@ class TimeTrackingViewSet(BulkActionBaseModelViewSet):
                         "user": request.user, "change_detection": change_lst}
         if change_lst:
             history_instance = History.objects.create(**history_data)
-            # create new threading for insert notification 
-            # should use task queue ? 
-            thread = CustomThread(target= proccess_history_change, args=(history_instance, request.user))
-            thread.start()
+            # process history in background 
+            proccess_history_change(history_instance)
         return response
     
     def destroy(self, request, *args, **kwargs):

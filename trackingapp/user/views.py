@@ -14,6 +14,7 @@ from trackingapp.custom_middleware import get_current_request_id
 from functools import reduce
 from base.authentication import CustomAuthentication
 from permissions.models import Role
+from base.decorators import query_debugger
 
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": WriteUserModelSerializer, "update": WriteUserModelSerializer,
@@ -23,7 +24,7 @@ class UserModelViewSet(CustomModelViewSetBase):
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
     authentication_classes = [CustomAuthentication]
-
+    
     @action(methods=['patch'], detail=True, url_path="update-role")
     def update_role(self, request, *args, **kwargs):
         """
@@ -63,9 +64,11 @@ class AuthenicationViewSet(CustomModelViewSetBase):
         return super().get_permissions()
 
     @action(methods=['post'], detail=False, url_path="login")
+    @query_debugger
     def login(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
         user = authenticate(
             request, username=serializer.validated_data['email'], password=serializer.validated_data['password'])
         if user:

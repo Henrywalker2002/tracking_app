@@ -7,8 +7,11 @@ from rest_framework.mixins import RetrieveModelMixin
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from media.views import process_add_to_media
+from base.task_queue import add_to_queue
 
-def proccess_history_change(history_instance, user):
+@add_to_queue
+def proccess_history_change(history_instance):
     """
     Add notification for user who subcribed time tracking
     """
@@ -18,7 +21,9 @@ def proccess_history_change(history_instance, user):
                  "type": 'TIME_TRACKING_HISTORY'} for user in user_lst]
     instance_lst = [Notification(**data) for data in data_lst]
     Notification.objects.bulk_create(instance_lst) 
-
+    process_add_to_media(history_instance)
+    
+    
 class NotificationViewset(GenericViewSet, RetrieveModelMixin, GetByUserIdMixin):
     
     queryset = Notification.objects.all()

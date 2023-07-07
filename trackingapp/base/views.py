@@ -20,10 +20,6 @@ class CustomModelViewSetBase(viewsets.ModelViewSet):
         
 class BulkCreateMixin:
     
-    def _bulk_create(self, data, user = None): 
-
-        return serializer
-    
     @action(methods= ['POST'], detail= False , url_path= 'bulk-create')
     def bulk_create(self, request):
         serializer = self.get_serializer(data = request.data, many = True)
@@ -32,11 +28,12 @@ class BulkCreateMixin:
         for obj in serializer.data:
             instance = self.get_serializer_class().Meta.model(**obj)
             if hasattr(instance, 'created_by'):
-                setattr(instance, 'created_by', user)
+                setattr(instance, 'created_by', request.user)
             instance_lst.append(instance)
-        self.get_serializer_class().Meta.model.objects.bulk_create(instance_lst)
+        res = self.get_serializer_class().Meta.model.objects.bulk_create(instance_lst)
+        res_serializer = self.get_serializer(instance = res, many = True)
         # have not fixed return 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(res_serializer.data, status=status.HTTP_201_CREATED)
 
 class BulkDeleteMixin:
     

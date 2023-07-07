@@ -17,20 +17,21 @@ class CustomPermission(BasePermission):
             else: 
                 appname, action = perm.split('.')
                 if view.basename == 'user':
-                    if role == "admin" :
-                        if view.action == action:
-                            return True
-                    else :
+                    if view.action == action:
                         if view.detail:
-                            if str(request.user.id) == (view.kwargs.get('pk') or ' '):
+                            if view.kwargs.get('pk') == str(request.user.id):
                                 return True
-                elif view.basename == "timetracking":
+                        else :
+                            return True
+                
+                elif view.basename in ['timetracking', 'notification']:
                     if action == 'all':
                         return True
                     else :
-                        return view.action == action
+                        if view.detail and view.kwargs.get('pk') == request.user.id:
+                            return True
+                        if request.user.id == request.GET.get('id'):
+                            return True
                 elif view.basename == "subcriber":
-                    return True 
-                elif view.basename == "notification":
                     return True
         return False

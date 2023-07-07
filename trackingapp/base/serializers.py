@@ -39,7 +39,7 @@ class BulkUpdateSerializer(serializers.ModelSerializer):
             count = len(self.Meta.model.objects.filter(id = id))
             if not count:
                 raise serializers.ValidationError(f'id {id} is not exist')
-        except Exception as e:
+        except ValueError as e:
             raise serializers.ValidationError(f'id {id} is not valid')
         return id
     

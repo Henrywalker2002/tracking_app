@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,7 +45,8 @@ INSTALLED_APPS = [
     'permissions',
     'time_tracking',
     'notification',
-    'media'
+    'media',
+    'base'
 ]
 
 MIDDLEWARE = [
@@ -160,3 +162,12 @@ CACHES = {
         }
     }
 }
+
+# config for email 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'davisdavis448@gmail.com'
+EMAIL_HOST_PASSWORD = 'aqkjshphizdcdkcq'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
