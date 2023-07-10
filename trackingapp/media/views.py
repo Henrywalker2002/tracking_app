@@ -10,6 +10,7 @@ from django.core import mail
 from django.conf import settings
 from smtplib import SMTPException
 from functools import reduce
+import logging
 
 def process_add_to_media(history_instance, media_to = None):
     media_to = media_to or "hung.nguyen0304@hcmut.edu.vn"
@@ -47,7 +48,8 @@ def send_all_mail():
             instance.status = "FAIL"
             instance.save()
             error_ids.append(instance.id)
-            
+    logging.info(f"send mail success {success_ids} error {error_ids}")
+    
     connection.close()
     
 class MediaViewSet(GenericViewSet, ListModelMixin):

@@ -10,7 +10,7 @@ from django.utils import timezone
 
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
-    custom get serializer class to get serializer class base on dict only
+    Custom get serializer class to get serializer class base on dict only
     """
     serializer_class = {}
     def get_serializer_class(self):
@@ -81,7 +81,7 @@ class BulkUpdateMixin:
 class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkUpdateMixin, BulkDeleteMixin):
     """
     Custom get serializer class to get serializer class base on dict 
-    Bulk update, bulk detele, bulk create for perrmision and roles, time tracking
+    Bulk update, bulk detele, bulk create
     """
     pass 
     

@@ -1,4 +1,4 @@
 log.txt
 .vscode
-trackingapp/*/__pycache__
 trackingapp/.venv
+*__pycache__*

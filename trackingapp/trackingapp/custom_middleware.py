@@ -1,7 +1,6 @@
 import uuid
 import logging
 import threading
-import functools
 
 logging.basicConfig(filename="log.txt", level=logging.INFO)
 
