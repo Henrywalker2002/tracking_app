@@ -31,5 +31,6 @@ urlpatterns = [
     path('docs/', schema_view.with_ui()),
     path('', include(router.urls)),
     path('login/', AuthenicationViewSet.as_view({'post': 'login'})),
-    path('logout/', AuthenicationViewSet.as_view({'post' : 'logout'}))
+    path('logout/', AuthenicationViewSet.as_view({'post' : 'logout'})),
+    path('forgot-password/', AuthenicationViewSet.as_view({'patch' : 'reset_password'}))
 ]

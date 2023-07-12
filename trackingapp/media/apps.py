@@ -13,9 +13,9 @@ class MediaConfig(AppConfig):
         thread.start()
     
     def send_mail(self):
-        from media.views import send_all_mail
+        from media.execute import send_all_mail
         schedule.every(5).minutes.do(send_all_mail)
-        
+
         while True:
             schedule.run_pending()
             time.sleep(1)

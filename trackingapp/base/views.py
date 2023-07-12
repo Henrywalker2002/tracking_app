@@ -10,10 +10,24 @@ from django.utils import timezone
 
 class CustomModelViewSetBase(viewsets.ModelViewSet):
     """
+    Inherit from viewsets.ModelViewSet
     Custom get serializer class to get serializer class base on dict only
     """
     serializer_class = {}
     def get_serializer_class(self):
+        # ensure that serializer_class must be a dict and have default 
+        assert self.serializer_class is not None, (
+            "'%s' should either include a `serializer_class` attribute, "
+            "or override the `get_serializer_class()` method."
+            % self.__class__.__name__
+        )
+        assert isinstance(self.serializer_class, dict), (
+            f"{self.__class__.__name__} serialize_class must be a dict"
+        )
+        assert "default" in self.serializer_class.keys(), (
+            f"{self.__class__.__name__} serializer_class must have default keys"
+        )
+        
         if self.action in self.serializer_class.keys():
             return self.serializer_class[self.action]
         return self.serializer_class['default']

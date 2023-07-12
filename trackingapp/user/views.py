@@ -1,5 +1,6 @@
-from user.serializers import (WriteUserModelSerializer, GetUserModelSerializer,
-                          LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, BulkUpdateUserSerializer)
+from user.serializers import (CreateUserModelSerializer, GetUserModelSerializer,
+                          LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, 
+                          BulkUpdateUserSerializer, UpdateUserSerializer, ForgotPasswordSerializer)
 from .models import User
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -15,11 +16,14 @@ from functools import reduce
 from base.authentication import CustomAuthentication
 from permissions.models import Role
 from base.decorators import query_debugger
+from media.execute import send_new_password
+import string
+import random
 
 class UserModelViewSet(CustomModelViewSetBase):
-    serializer_class = {"create": WriteUserModelSerializer, "update": WriteUserModelSerializer,
-                        "partial_update": WriteUserModelSerializer, "update_role": UpdateRolesSerializer,
-                        "default": GetUserModelSerializer, "bulk_create": WriteUserModelSerializer,
+    serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer,
+                        "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
+                        "default": GetUserModelSerializer, "bulk_create": CreateUserModelSerializer,
                         "bulk_update": BulkUpdateUserSerializer, "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
@@ -55,7 +59,7 @@ class UserModelViewSet(CustomModelViewSetBase):
         return Response()
 
 class AuthenicationViewSet(CustomModelViewSetBase):
-    serializer_class = {"login": LoginSerializer, "default": LoginSerializer}
+    serializer_class = {"login": LoginSerializer,"reset_password" : ForgotPasswordSerializer , "default": LoginSerializer}
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
@@ -86,3 +90,15 @@ class AuthenicationViewSet(CustomModelViewSetBase):
     def logout(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(methods= ['patch'], detail= False, url_path='forgot-password')
+    def reset_password(self, request):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid()
+        instance = User.objects.get(email = serializer.data.get("email"))
+        password = ''.join(random.choices(string.ascii_uppercase 
+                                          + string.ascii_lowercase + string.digits, k = 8))
+        instance.set_password(password)
+        send_new_password(password, serializer.data.get("email"))
+        instance.save()
+        return Response(status= status.HTTP_204_NO_CONTENT)

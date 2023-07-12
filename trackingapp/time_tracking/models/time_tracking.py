@@ -47,15 +47,9 @@ class TimeTracking(BaseModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         """
         Add default subcriber to who have this task 
-        Extend time of release if nessessary
         """
         from time_tracking.models.subcriber import Subcriber
-        
-        if self.start_time < self.release.start_time:
-            self.release.start_time = self.start_time
-        if self.end_time > self.release.end_time:
-            self.release.end_time = self.end_time
-        self.release.save()
+    
         super().save(force_insert, force_update, using, update_fields)
         subcriber_instance = Subcriber.objects.filter(
             user=self.user, time_tracking=self)

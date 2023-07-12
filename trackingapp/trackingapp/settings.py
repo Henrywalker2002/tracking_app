@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'time_tracking',
     'notification',
     'media',
-    'base'
+    'base',
+    'admin_app'
 ]
 
 MIDDLEWARE = [

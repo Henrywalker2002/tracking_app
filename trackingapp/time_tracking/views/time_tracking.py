@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from base.decorators import query_debugger
 from rest_framework.decorators import action
 from rest_framework import status
+from notification.execute import proccess_history_change
 
 
 class TimeTrackingViewSet(BaseViewRecycle):
@@ -20,7 +21,6 @@ class TimeTrackingViewSet(BaseViewRecycle):
         """
         override to get change field 
         """
-        from notification.views import proccess_history_change
 
         current_time_tracking = self.get_object()
         old_instance = self.get_serializer(current_time_tracking).data

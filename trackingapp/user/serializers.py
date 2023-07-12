@@ -9,7 +9,7 @@ import logging
 from trackingapp.custom_middleware import get_current_request_id
 from base.serializers import BulkUpdateSerializer
 
-class WriteUserModelSerializer(serializers.ModelSerializer):
+class CreateUserModelSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
 
@@ -114,3 +114,14 @@ class LoginSerializer(serializers.Serializer):
         Model = User
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name', 'phone', 'permission_code_names', 'role_names']
         
+class UpdateUserSerializer(CreateUserModelSerializer):
+    email = serializers.EmailField(read_only= True)
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
+    def validate_email(self, email):
+        instance = User.objects.filter(email = email)
+        if not instance:
+            raise serializers.ValidationError(f"account with email {email} doesn't exist")
+        return email
