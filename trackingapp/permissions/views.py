@@ -1,6 +1,6 @@
 from base.views import BulkActionBaseModelViewSet
-from permissions.serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer, BulkUpdatePermissionSerializer,
-                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer, BulkUpdateRoleSerializer)
+from permissions.serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer,
+                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer)
 from .models import Role, Permission
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -13,7 +13,7 @@ from functools import reduce
 class RoleModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WriteRoleSerializer, "update": WriteRoleSerializer, "partial_update": WriteRoleSerializer,
-                        "bulk_update": BulkUpdateRoleSerializer, "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
+                        "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
 
     queryset = Role.objects.all()
     permission_classes = [CustomPermission]
@@ -30,16 +30,7 @@ class RoleModelViewSet(BulkActionBaseModelViewSet):
 class PermissionModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WritePermissionSerializer, "update": WritePermissionSerializer, "partial_update": WritePermissionSerializer,
-                        "bulk_delete": WritePermissionSerializer, "bulk_update": BulkUpdatePermissionSerializer, "default": GetPermissionSerializer}
+                        "bulk_delete": WritePermissionSerializer, "default": GetPermissionSerializer}
     
     queryset = Permission.objects.all()
     permission_classes = [CustomPermission]
-
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)

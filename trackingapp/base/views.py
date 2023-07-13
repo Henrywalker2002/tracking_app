@@ -92,10 +92,10 @@ class BulkUpdateMixin:
         return_serializer = self.get_serializer(instance_lst, many = True)
         return Response(return_serializer.data)
         
-class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkUpdateMixin, BulkDeleteMixin):
+class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkDeleteMixin):
     """
     Custom get serializer class to get serializer class base on dict 
-    Bulk update, bulk detele, bulk create
+    Bulk detele, bulk create
     """
     pass 
     

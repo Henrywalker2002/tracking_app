@@ -5,7 +5,7 @@ from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.serializers.time_tracking import TimeTrackingSerializer
 
 
-class WrirteReleaseSerializer(serializers.ModelSerializer):
+class ReleaseSerializer(serializers.ModelSerializer):
     """
 
     """
@@ -36,12 +36,4 @@ class WrirteReleaseSerializer(serializers.ModelSerializer):
             if error_lst:
                 raise serializers.ValidationError(error_lst)
         return data
-
-class ReadReleaseSerializer(serializers.ModelSerializer):
-    email_updated_by = serializers.CharField(read_only=True)
-    email_created_by = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Release
-        fields = '__all__'
         

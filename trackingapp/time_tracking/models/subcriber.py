@@ -23,6 +23,3 @@ class Subcriber(BaseModel):
     def email_user(self):
         return (cache.get(self.user_id) if cache.get(self.user_id)
                 else cache.get_or_set(self.user_id, self.user.email))
-
-    class Meta:
-        unique_together = ('time_tracking', 'user')

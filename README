@@ -1,0 +1,3 @@
+list command:
+    python manage.py run_auto_clear_trash 
+    python manage.py run_check_task  

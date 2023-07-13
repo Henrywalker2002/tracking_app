@@ -9,6 +9,7 @@ class BulkDeleteSerializer(serializers.ModelSerializer):
     Must have class Meta have fields = ['ids']
     """
     ids = serializers.ListField(child = serializers.UUIDField())
+    
         
     def validate_ids(self, ids):
         logging.info('{} begin validate_ids on bulk'.format(self.context['request']._request.content_params.get('id')))
@@ -23,24 +24,5 @@ class BulkDeleteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error_ids)
         logging.info('{} end validate_ids on bulk'.format(self.context['request']._request.content_params.get('id')))
         return ids
-
-    
-class BulkUpdateSerializer(serializers.ModelSerializer):
-    """
-    Only vadidate id in list object, must add class Meta to use it 
-    """
-    id = serializers.UUIDField()
-    
-    def update(self, instance, data):
-        return super().update(instance, data)
-    
-    def validate_id(self, id):
-        try :
-            count = len(self.Meta.model.objects.filter(id = id))
-            if not count:
-                raise serializers.ValidationError(f'id {id} is not exist')
-        except ValueError as e:
-            raise serializers.ValidationError(f'id {id} is not valid')
-        return id
     
         

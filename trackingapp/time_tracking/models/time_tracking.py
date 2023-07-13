@@ -8,6 +8,7 @@ from trackingapp.custom_middleware import get_current_user
 from django.db import transaction
 from .release import Release
 from django.db import connection, reset_queries
+from functools import cached_property
 
 
 class StatusTimeTracking(models.TextChoices):
@@ -32,6 +33,10 @@ class TimeTracking(BaseModel):
     description = models.TextField(null=True)
     note = models.TextField(null=True)
     is_deleted = models.BooleanField(null=False, default=False)
+    
+    @cached_property
+    def release_name(self):
+        return self.release.release
 
     @property
     def email_user(self):
@@ -48,11 +53,10 @@ class TimeTracking(BaseModel):
         """
         Add default subcriber to who have this task 
         """
-        from time_tracking.models.subcriber import Subcriber
+        from time_tracking.models.subcriber import Subcriber, SubcriberType
     
         super().save(force_insert, force_update, using, update_fields)
         subcriber_instance = Subcriber.objects.filter(
-            user=self.user, time_tracking=self)
+            user=self.user, time_tracking=self, object_type= SubcriberType.TASK)
         if not subcriber_instance:
-            Subcriber.objects.create(user=self.user, time_tracking=self)
-
+            Subcriber.objects.create(user=self.user, time_tracking=self, object_type= SubcriberType.TASK)

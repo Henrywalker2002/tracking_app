@@ -1,11 +1,13 @@
 from time_tracking.models.time_tracking import TimeTracking
 from rest_framework import serializers
+from base.serializers import BulkDeleteSerializer
 
 class TimeTrackingSerializer(serializers.ModelSerializer):
     
     email_updated_by = serializers.CharField(read_only= True)
     email_created_by = serializers.CharField(read_only= True)
     email_user = serializers.CharField(read_only= True)
+    release_name = serializers.CharField(read_only= True)
     
     class Meta:
         model = TimeTracking
@@ -27,3 +29,8 @@ class TimeTrackingSerializer(serializers.ModelSerializer):
         if error_lst:
             raise serializers.ValidationError(error_lst)
         return data
+    
+class BulkDeleteTimeTrackingSerializer(BulkDeleteSerializer):
+    class Meta:
+        model = TimeTracking
+        fields = ['ids']

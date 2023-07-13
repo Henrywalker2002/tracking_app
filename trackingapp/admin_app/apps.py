@@ -9,3 +9,4 @@ class AdminConfig(AppConfig):
     def ready(self):
         thread_process_task = threading.Thread(target= proccess_task_queue, args=(), daemon= True)
         thread_process_task.start()
+        

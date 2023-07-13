@@ -1,6 +1,6 @@
 from user.serializers import (CreateUserModelSerializer, GetUserModelSerializer,
                           LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, 
-                          BulkUpdateUserSerializer, UpdateUserSerializer, ForgotPasswordSerializer)
+                          UpdateUserSerializer, ForgotPasswordSerializer)
 from .models import User
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -17,6 +17,7 @@ from base.authentication import CustomAuthentication
 from permissions.models import Role
 from base.decorators import query_debugger
 from media.execute import send_new_password
+from rest_framework import viewsets
 import string
 import random
 
@@ -24,7 +25,7 @@ class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer,
                         "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
                         "default": GetUserModelSerializer, "bulk_create": CreateUserModelSerializer,
-                        "bulk_update": BulkUpdateUserSerializer, "delete_role" : DeleteRolesSerializer}
+                        "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
     authentication_classes = [CustomAuthentication]
@@ -58,9 +59,14 @@ class UserModelViewSet(CustomModelViewSetBase):
         [instance.roles.remove(Role.objects.get(id = id)) for id in request.data.get('roles')]
         return Response()
 
-class AuthenicationViewSet(CustomModelViewSetBase):
+class AuthenicationViewSet(viewsets.GenericViewSet):
     serializer_class = {"login": LoginSerializer,"reset_password" : ForgotPasswordSerializer , "default": LoginSerializer}
     permission_classes = [permissions.IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action in self.serializer_class.keys():
+            return self.serializer_class[self.action]
+        return self.serializer_class['default']
 
     def get_permissions(self):
         if self.action == "login":
@@ -98,7 +104,7 @@ class AuthenicationViewSet(CustomModelViewSetBase):
         instance = User.objects.get(email = serializer.data.get("email"))
         password = ''.join(random.choices(string.ascii_uppercase 
                                           + string.ascii_lowercase + string.digits, k = 8))
-        instance.set_password(password)
+        instance.password = password
         send_new_password(password, serializer.data.get("email"))
         instance.save()
         return Response(status= status.HTTP_204_NO_CONTENT)

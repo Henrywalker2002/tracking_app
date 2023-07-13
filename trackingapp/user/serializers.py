@@ -7,7 +7,7 @@ from django.db import transaction
 from functools import reduce
 import logging
 from trackingapp.custom_middleware import get_current_request_id
-from base.serializers import BulkUpdateSerializer
+
 
 class CreateUserModelSerializer(serializers.ModelSerializer):
 
@@ -89,14 +89,6 @@ class GetUserModelSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'first_name',
                   'last_name', 'full_name', 'phone', "role_names"]
-
-class BulkUpdateUserSerializer(BulkUpdateSerializer):
-    
-    password = serializers.CharField(write_only= True)
-    
-    class Meta: 
-        model = User
-        fields = '__all__' 
 
 class LoginSerializer(serializers.Serializer):
     

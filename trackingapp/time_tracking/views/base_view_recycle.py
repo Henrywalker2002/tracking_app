@@ -23,7 +23,7 @@ class BaseViewRecycle(BulkActionBaseModelViewSet):
 
         queryset = self.queryset
         if isinstance(queryset, QuerySet):
-            if self.action not in ["get_time_tracking_deleted", "restore"]:
+            if self.action not in ["get_item_deleted", "restore"]:
                 queryset = queryset.filter(is_deleted=False)
             else:
                 queryset = queryset.filter(is_deleted=True)
@@ -40,7 +40,7 @@ class BaseViewRecycle(BulkActionBaseModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, url_path='recycle')
-    def get_time_tracking_deleted(self, request):
+    def get_item_deleted(self, request):
         queryset = self.filter_queryset(self.get_queryset())
 
         page = self.paginate_queryset(queryset)

@@ -5,6 +5,7 @@ from user.models import User
 from time_tracking.models.history import History
 from collections import OrderedDict
 from rest_framework.relations import PKOnlyObject
+from rest_framework.fields import SkipField
 
 
 class ReadHistorySerializer(serializers.ModelSerializer):
@@ -42,10 +43,10 @@ class ReadHistorySerializer(serializers.ModelSerializer):
                 ret[field.field_name] = None
             else:
                 if field.field_name == "change_detection":
-                    if attribute.get('user_id'):
-                        new_value = get_email(attribute.get('user_id').get('new_value'))
-                        old_value = get_email(attribute.get('user_id').get('old_value'))
-                        attribute['user_id'] = {"new_value" : new_value, "old_value" : old_value}
-                        attribute['user_email'] = attribute.pop('user_id')
+                    if attribute.get('user'):
+                        new_value = get_email(attribute.get('user').get('new_value'))
+                        old_value = get_email(attribute.get('user').get('old_value'))
+                        attribute['user'] = {"new_value" : new_value, "old_value" : old_value}
+                        attribute['user_email'] = attribute.pop('user')
                 ret[field.field_name] = field.to_representation(attribute)
         return ret
