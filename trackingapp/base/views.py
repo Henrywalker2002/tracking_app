@@ -112,7 +112,7 @@ class GetByUserIdMixin:
             return Response(data = {"id" : f'must have param query id'}, status= status.HTTP_400_BAD_REQUEST)
         try: 
             id = UUID(param.get('id'))
-            instance_lst = self.get_queryset().filter(user_id = id)
+            instance_lst = self.get_queryset().filter(user_id = id).order_by('-created_at')
             
             page = self.paginate_queryset(instance_lst)
             if page is not None:

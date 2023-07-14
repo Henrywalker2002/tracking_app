@@ -1,6 +1,5 @@
 from notification.models import Notification, TypeNotification
 from time_tracking.models.subcriber import Subcriber, SubcriberType
-from media.execute import process_add_to_media
 from admin_app.task_queue import add_to_queue
 
 
@@ -15,7 +14,6 @@ def add_notification_for_history_change(history_instance):
                  "type": 'TIME_TRACKING_HISTORY'} for user in user_lst]
     instance_lst = [Notification(**data) for data in data_lst]
     Notification.objects.bulk_create(instance_lst)
-    process_add_to_media(history_instance)
 
 
 def add_notification_for_release(tasks):

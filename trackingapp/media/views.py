@@ -11,6 +11,3 @@ class MediaViewSet(BulkActionBaseModelViewSet):
     
     queryset = Media.objects.all()
     serializer_class = {"default" : MediaSerializer}
-    
-    
-    

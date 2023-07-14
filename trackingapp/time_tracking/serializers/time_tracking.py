@@ -20,7 +20,7 @@ class TimeTrackingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'end_time must be after start_time')
 
-        release = data.get('release')
+        release = data.get('release') or self.instance.release
         error_lst = []
         if start_time < release.start_time: 
             error_lst.append("start time of task must be earlier than start time of release")

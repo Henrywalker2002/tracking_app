@@ -1,8 +1,11 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
 from django.db import transaction
 from functools import reduce
+from django.utils import timezone
+from datetime import timedelta
 
 
 class User(AbstractBaseUser):
@@ -35,7 +38,15 @@ class User(AbstractBaseUser):
     @transaction.atomic
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         from permissions.models import Role
-        self.set_password(self.password)
-        super().save(force_insert, force_update , using, update_fields)
+
+        super().save(force_insert, force_update, using, update_fields)
         if not len(self.roles.all()):
-            self.roles.set([Role.objects.get(code_name= 'user')])
+            self.roles.set([Role.objects.get(code_name='user')])
+
+
+class ResetCodeUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True, max_length=128)
+    code = models.CharField(max_length=6)
+    expired_time = models.DateTimeField(
+        default=timezone.now() + timedelta(days=1))

@@ -6,5 +6,4 @@ class Command(BaseCommand):
     help = "command to check task"
     
     def handle(self, *args, **kwargs):
-        print(123)
         check_task_over_deadline()

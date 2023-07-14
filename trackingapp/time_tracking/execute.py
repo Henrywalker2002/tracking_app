@@ -11,7 +11,7 @@ def check_task_over_deadline():
     """
     def inner():
         expired_task = TimeTracking.objects.filter(
-            end_time__gte= timezone.now()).exclude(status=StatusTimeTracking.DONE)
+            end_time__lte = timezone.now()).exclude(status=StatusTimeTracking.DONE)
         add_notification_for_release(expired_task)
     
     schedule.every().day.at("00:00").do(inner)

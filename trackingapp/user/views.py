@@ -1,6 +1,6 @@
 from user.serializers import (CreateUserModelSerializer, GetUserModelSerializer,
                           LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, 
-                          UpdateUserSerializer, ForgotPasswordSerializer)
+                          UpdateUserSerializer, ForgotPasswordSerializer, ResetPassword)
 from .models import User
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -16,16 +16,16 @@ from functools import reduce
 from base.authentication import CustomAuthentication
 from permissions.models import Role
 from base.decorators import query_debugger
-from media.execute import send_new_password
+from media.execute import send_code
 from rest_framework import viewsets
 import string
 import random
+from user.models import ResetCodeUser
 
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer,
                         "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
-                        "default": GetUserModelSerializer, "bulk_create": CreateUserModelSerializer,
-                        "delete_role" : DeleteRolesSerializer}
+                        "default": GetUserModelSerializer, "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
     permission_classes = [CustomPermission]
     authentication_classes = [CustomAuthentication]
@@ -36,13 +36,15 @@ class UserModelViewSet(CustomModelViewSetBase):
         Append role to user
         """
         return super().update(request, *args, **kwargs)
-
-    def list(self, request, *args, **kwargs):
-        id = get_current_request_id()
-        logging.info(f'request id {id} begin to list user')
-        instance_list = super().list(request, *args, **kwargs)
-        logging.info(f'request id {id} end to list user')
-        return instance_list
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        user = User(**serializer.validated_data)
+        user.set_password(user.password)
+        user.save()
+        serializer_return = self.get_serializer(user)
+        return Response(data = serializer_return.data, status= 201)
 
     @action(detail=True, url_path="get-role")
     def get_role(self, request, pk):
@@ -60,8 +62,9 @@ class UserModelViewSet(CustomModelViewSetBase):
         return Response()
 
 class AuthenicationViewSet(viewsets.GenericViewSet):
-    serializer_class = {"login": LoginSerializer,"reset_password" : ForgotPasswordSerializer , "default": LoginSerializer}
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = {"login": LoginSerializer,"send_code" : ForgotPasswordSerializer , 
+                        "reset_password" : ResetPassword, "default": LoginSerializer}
+    permission_classes = [permissions.AllowAny]
     
     def get_serializer_class(self):
         if self.action in self.serializer_class.keys():
@@ -69,8 +72,8 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
         return self.serializer_class['default']
 
     def get_permissions(self):
-        if self.action == "login":
-            return [permissions.AllowAny()]
+        if self.action == "logout":
+            return [permissions.IsAuthenticated()]
         return super().get_permissions()
 
     @action(methods=['post'], detail=False, url_path="login")
@@ -97,14 +100,26 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(methods= ['patch'], detail= False, url_path='forgot-password')
+    @action(methods= ['patch'], detail= False, url_path='send-code')
+    def send_code(self, request):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid()
+        code = random.randint(100000, 999999)
+        obj, created = ResetCodeUser.objects.update_or_create(
+            email = serializer.data.get('email'), defaults = {"code" : code})
+        send_code(code, serializer.data.get('email'))
+        return Response(status= status.HTTP_204_NO_CONTENT)
+
+    @action(methods= ['patch'], detail= False, url_path='reset-password')
     def reset_password(self, request):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid()
-        instance = User.objects.get(email = serializer.data.get("email"))
-        password = ''.join(random.choices(string.ascii_uppercase 
-                                          + string.ascii_lowercase + string.digits, k = 8))
-        instance.password = password
-        send_new_password(password, serializer.data.get("email"))
-        instance.save()
-        return Response(status= status.HTTP_204_NO_CONTENT)
+        instance = ResetCodeUser(email = serializer.data.get('email'), code = serializer.data.get('code'))
+        if instance:
+            user = User.objects.get(email = serializer.data.get('email'))
+            user.password = serializer.data.get('password')
+            user.save()
+            instance.delete()
+            return Response(status= status.HTTP_200_OK)
+        else :
+            return Response(data = "wrong code", status=status.HTTP_400_BAD_REQUEST)

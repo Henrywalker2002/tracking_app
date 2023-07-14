@@ -1,6 +1,6 @@
 from base.views import BulkActionBaseModelViewSet
 from permissions.serializers import (WriteRoleSerializer, GetRoleSerializer, WritePermissionSerializer,
-                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer)
+                          GetPermissionSerializer, BulkDeteleRoleSerializer, BulkDetelePermissionSerializer, UpdateRoleSerializer)
 from .models import Role, Permission
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -13,7 +13,8 @@ from functools import reduce
 class RoleModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WriteRoleSerializer, "update": WriteRoleSerializer, "partial_update": WriteRoleSerializer,
-                        "bulk_delete": BulkDeteleRoleSerializer, "default": GetRoleSerializer}
+                        "bulk_delete": BulkDeteleRoleSerializer, 'add_permission' : UpdateRoleSerializer, 
+                        "delete_permission" : UpdateRoleSerializer , "default": GetRoleSerializer}
 
     queryset = Role.objects.all()
     permission_classes = [CustomPermission]
@@ -26,7 +27,18 @@ class RoleModelViewSet(BulkActionBaseModelViewSet):
             lst.append(per.code_name)
         return Response(lst)
 
-
+    @action(detail= True, url_path= 'add-permission', methods= ['patch'])
+    def add_permission(self, request, pk):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data = request.data, partial = True)
+        serializer.is_valid(raise_exception = True)
+        serializer.save()
+        return Response(serializer.data)
+    
+    @action(detail= True, url_path='delete-permission', methods= ['patch'])
+    def delete_permission(self, request, pk):
+        return self.add_permission(request, pk)
+        
 class PermissionModelViewSet(BulkActionBaseModelViewSet):
 
     serializer_class = {"create": WritePermissionSerializer, "update": WritePermissionSerializer, "partial_update": WritePermissionSerializer,

@@ -21,4 +21,3 @@ class NotificationViewset(GenericViewSet, RetrieveModelMixin, GetByUserIdMixin):
         instance.checked = True
         instance.save()
         return Response(self.get_serializer(instance).data)
-    

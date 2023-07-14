@@ -117,3 +117,16 @@ class ForgotPasswordSerializer(serializers.Serializer):
         if not instance:
             raise serializers.ValidationError(f"account with email {email} doesn't exist")
         return email
+
+class ResetPassword(ForgotPasswordSerializer):
+    # inherit to get email fields 
+    code = serializers.CharField()
+    password = serializers.CharField()
+    
+    def validate_code(self, code):
+        return True if re.match("^\d{6}$", code) else False
+    
+    def validate_password(self, password):
+        if len(password) < 8:
+            raise serializers.ValidationError('password must have at least 8 characters')
+        return password

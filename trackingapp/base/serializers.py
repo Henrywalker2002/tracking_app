@@ -9,7 +9,6 @@ class BulkDeleteSerializer(serializers.ModelSerializer):
     Must have class Meta have fields = ['ids']
     """
     ids = serializers.ListField(child = serializers.UUIDField())
-    
         
     def validate_ids(self, ids):
         logging.info('{} begin validate_ids on bulk'.format(self.context['request']._request.content_params.get('id')))
