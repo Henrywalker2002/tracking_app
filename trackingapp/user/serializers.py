@@ -124,7 +124,9 @@ class ResetPassword(ForgotPasswordSerializer):
     password = serializers.CharField()
     
     def validate_code(self, code):
-        return True if re.match("^\d{6}$", code) else False
+        if not re.match("^\d{6}$", code):
+            raise serializers.ValidationError("code is not valid")
+        return code
     
     def validate_password(self, password):
         if len(password) < 8:

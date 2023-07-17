@@ -34,13 +34,14 @@ class WriteRoleSerializer(serializers.ModelSerializer):
         return permission
 
 
-class UpdateRoleSerializer(serializers.ModelSerializer):
+class UpdatePermissionOfRoleSerializer(serializers.ModelSerializer):
     
-    permission = serializers.PrimaryKeyRelatedField(queryset = Permission.objects.all(), many = True)
+    permission = serializers.PrimaryKeyRelatedField(queryset = Permission.objects.all(), many = True, write_only= True)
+    permission_name = serializers.StringRelatedField(many = True,read_only= True)
     
     class Meta:
         model = Role 
-        fields = ['permission']
+        fields = ['permission', 'permission_name']
     
     def update(self, instance, data):
         if self.context.get('view').action == "add_permission":

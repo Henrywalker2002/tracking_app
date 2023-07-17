@@ -33,5 +33,5 @@ urlpatterns = [
     path('login/', AuthenicationViewSet.as_view({'post': 'login'})),
     path('logout/', AuthenicationViewSet.as_view({'post' : 'logout'})),
     path('send-code/', AuthenicationViewSet.as_view({'post' : 'send_code'})),
-    path('reset-password', AuthenicationViewSet.as_view({'patch' : "reset_password"}))
+    path('reset-password/', AuthenicationViewSet.as_view({'patch' : "reset_password"}))
 ]

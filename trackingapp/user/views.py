@@ -21,6 +21,8 @@ from rest_framework import viewsets
 import string
 import random
 from user.models import ResetCodeUser
+from django.utils import timezone
+from datetime import timedelta
 
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer,
@@ -45,6 +47,31 @@ class UserModelViewSet(CustomModelViewSetBase):
         user.save()
         serializer_return = self.get_serializer(user)
         return Response(data = serializer_return.data, status= 201)
+    
+    def update(self, request, *args, **kwargs):
+        """
+        Set hash password for db
+        """
+        partial = kwargs.pop('partial', False)
+        password = None 
+        if 'password' in request.data.keys():
+            password = request.data.get('password')
+        instance = self.get_object()
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        if password: 
+            instance.set_password(password)
+            instance.save()
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
     @action(detail=True, url_path="get-role")
     def get_role(self, request, pk):
@@ -103,23 +130,24 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
     @action(methods= ['patch'], detail= False, url_path='send-code')
     def send_code(self, request):
         serializer = self.get_serializer(data = request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception = True)
         code = random.randint(100000, 999999)
         obj, created = ResetCodeUser.objects.update_or_create(
-            email = serializer.data.get('email'), defaults = {"code" : code})
+            email = serializer.data.get('email'), defaults = {"code" : code, "expired_time" : timezone.now() + timedelta(days= 1)})
         send_code(code, serializer.data.get('email'))
         return Response(status= status.HTTP_204_NO_CONTENT)
 
     @action(methods= ['patch'], detail= False, url_path='reset-password')
     def reset_password(self, request):
         serializer = self.get_serializer(data = request.data)
-        serializer.is_valid()
-        instance = ResetCodeUser(email = serializer.data.get('email'), code = serializer.data.get('code'))
+        serializer.is_valid(raise_exception = True)
+        instance = ResetCodeUser.objects.filter(email = serializer.data.get('email'), 
+                                 code = serializer.data.get('code'), expired_time__gte = timezone.now())
         if instance:
             user = User.objects.get(email = serializer.data.get('email'))
-            user.password = serializer.data.get('password')
+            user.set_password(serializer.data.get('password'))
             user.save()
             instance.delete()
-            return Response(status= status.HTTP_200_OK)
+            return Response(status= status.HTTP_204_NO_CONTENT)
         else :
-            return Response(data = "wrong code", status=status.HTTP_400_BAD_REQUEST)
+            return Response(data = {"detail" : "wrong code or code expired"}, status=status.HTTP_400_BAD_REQUEST)
