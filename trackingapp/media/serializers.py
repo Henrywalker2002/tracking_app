@@ -2,9 +2,7 @@ from rest_framework import serializers
 from media.models import Media, MediaStatusChoices
 
         
-class MediaSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(read_only= True)
-    retry_count = serializers.IntegerField(read_only= True)
+class WriteMediaSerializer(serializers.ModelSerializer):
     
     def validate(self, data):
         if self.instance and self.instance.status == MediaStatusChoices.SUCCESS:
@@ -13,4 +11,10 @@ class MediaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Media
-        fields= '__all__'
+        fields = ['media_from', 'media_to', 'content', 'content_type', 'sending_method']
+        
+class ReadMediaSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Media 
+        fields = '__all__'

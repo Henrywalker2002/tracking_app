@@ -9,10 +9,3 @@ class History(BaseModel):
         TimeTracking, on_delete=models.CASCADE, null=False)
     change_detection = models.JSONField(null=False)
 
-    @property
-    def email_user(self):
-        if cache.get(self.user_id):
-            return cache.get(self.user_id)
-        elif self.user:
-            return cache.get_or_set(self.user_id, self.user.email)
-

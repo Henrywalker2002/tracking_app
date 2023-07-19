@@ -9,7 +9,7 @@ from rest_framework.authentication import authenticate
 from rest_framework import status
 from django.contrib.auth import login, logout
 from base.views import CustomModelViewSetBase
-from base.permission import CustomPermission
+from user.custom_permission import UserPermission
 import logging
 from trackingapp.custom_middleware import get_current_request_id
 from functools import reduce
@@ -29,7 +29,7 @@ class UserModelViewSet(CustomModelViewSetBase):
                         "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
                         "default": GetUserModelSerializer, "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
-    permission_classes = [CustomPermission]
+    permission_classes = [UserPermission]
     authentication_classes = [CustomAuthentication]
     
     @action(methods=['patch'], detail=True, url_path="update-role")
@@ -65,11 +65,6 @@ class UserModelViewSet(CustomModelViewSetBase):
         if password: 
             instance.set_password(password)
             instance.save()
-
-        if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
-            instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
 

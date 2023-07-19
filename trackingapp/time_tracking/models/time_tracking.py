@@ -38,13 +38,6 @@ class TimeTracking(BaseModel):
     def release_name(self):
         return self.release.release
 
-    @property
-    def email_user(self):
-        if cache.get(self.user_id):
-            return cache.get(self.user_id)
-        elif self.user:
-            return cache.get_or_set(self.user_id, self.user.email)
-
     def __str__(self):
         return str(self.id)
 
@@ -56,7 +49,7 @@ class TimeTracking(BaseModel):
         from time_tracking.models.subcriber import Subcriber, SubcriberType
     
         super().save(force_insert, force_update, using, update_fields)
-        subcriber_instance = Subcriber.objects.filter(
-            user=self.user, time_tracking=self, object_type= SubcriberType.TASK)
-        if not subcriber_instance:
+        is_exist = Subcriber.objects.filter(
+            user=self.user, time_tracking=self, object_type= SubcriberType.TASK).exists()
+        if not is_exist:
             Subcriber.objects.create(user=self.user, time_tracking=self, object_type= SubcriberType.TASK)

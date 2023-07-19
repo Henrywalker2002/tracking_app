@@ -5,15 +5,38 @@ from user.models import User
 from base.serializers import BulkDeleteSerializer
 from functools import reduce
 import uuid
-from user.serializers import GetUserModelSerializer
 
+class PermissionSerializer(serializers.ModelSerializer):
+
+    id = serializers.UUIDField(read_only= True)
+    
+    class Meta:
+        model = Permission
+        fields = ['code_name', 'friendly_name', 'id']
+
+
+class BulkDetelePermissionSerializer(BulkDeleteSerializer):
+
+    class Meta:
+        model = Permission
+        fields = ['ids']
+
+class GetRoleSerializer(serializers.ModelSerializer):
+
+    permission = PermissionSerializer(many = True, read_only= True)
+    
+    class Meta:
+        model = Role
+        fields = ['id', 'code_name', 'friendly_name', 'permission']
+        
 
 class WriteRoleSerializer(serializers.ModelSerializer):
+    
+    permission = serializers.PrimaryKeyRelatedField(many = True, required= False, queryset = Permission.objects.all())
 
     class Meta:
         model = Role
-        fields = ['id', 'created_by', 'updated_by', 'friendly_name', 'code_name',
-                  'permission', 'email_created_by', 'email_updated_by', 'permission_name']
+        fields = ['code_name', 'friendly_name', 'permission']
 
     def validate_permission(self, permission):
         error_ids = []
@@ -53,46 +76,8 @@ class UpdatePermissionOfRoleSerializer(serializers.ModelSerializer):
         return super().update(instance, data)
 
 
-class GetRoleSerializer(serializers.ModelSerializer):
-
-    email_updated_by = serializers.CharField(read_only=True)
-    email_created_by = serializers.CharField(read_only=True)
-    permission_name = serializers.ListField(child=serializers.CharField())
-
-    class Meta:
-        model = Role
-        fields = '__all__'
-
-
 class BulkDeteleRoleSerializer(BulkDeleteSerializer):
 
     class Meta:
         model = Role
-        fields = ['ids']
-
-
-class WritePermissionSerializer(serializers.ModelSerializer):
-
-    email_updated_by = serializers.CharField(read_only=True)
-    email_created_by = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Permission
-        fields = '__all__'
-
-
-class GetPermissionSerializer(serializers.ModelSerializer):
-
-    email_updated_by = serializers.CharField(read_only=True)
-    email_created_by = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Permission
-        fields = '__all__'
-
-
-class BulkDetelePermissionSerializer(BulkDeleteSerializer):
-
-    class Meta:
-        model = Permission
         fields = ['ids']

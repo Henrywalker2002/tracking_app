@@ -7,6 +7,7 @@ from django.db import transaction
 from functools import reduce
 import logging
 from trackingapp.custom_middleware import get_current_request_id
+from permissions.serializers import GetRoleSerializer
 
 
 class CreateUserModelSerializer(serializers.ModelSerializer):
@@ -16,7 +17,7 @@ class CreateUserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'password',
-                  'first_name', 'last_name', 'created_at', 'modified_at', 'phone', 'role_names']
+                  'first_name', 'last_name', 'phone', 'roles']
 
     def validate_phone(self, phone):
         regex_phone = "^(0|\+84)\d{9}$"
@@ -85,10 +86,12 @@ class DeleteRolesSerializer(serializers.ModelSerializer):
 
 class GetUserModelSerializer(serializers.ModelSerializer):
 
+    roles = GetRoleSerializer(many = True)
+    
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name',
-                  'last_name', 'full_name', 'phone', "role_names"]
+                  'last_name', 'full_name', 'phone', "roles"]
 
 class LoginSerializer(serializers.Serializer):
     

@@ -24,7 +24,7 @@ class Media(BaseModel):
     media_from = models.JSONField(null=False, db_column = "from")
     media_to = models.JSONField(null=False)
     content = models.TextField(null=False)
-    context_type = models.CharField(
+    content_type = models.CharField(
         max_length=128, choices=ContentTypeChoices.choices, default=ContentTypeChoices.TEXT_PLAIN, null=False)
     sending_method = models.CharField(
         max_length=128, choices=SendMethodChoices.choices, null=False)

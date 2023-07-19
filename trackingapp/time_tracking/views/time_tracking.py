@@ -1,8 +1,7 @@
 from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.models.history import History
 from time_tracking.models.subcriber import Subcriber, SubcriberType
-from time_tracking.serializers.time_tracking import TimeTrackingSerializer, BulkDeleteTimeTrackingSerializer
-from time_tracking.serializers.release import ReleaseSerializer
+from time_tracking.serializers.time_tracking import WriteTimeTrackingSerializer, ReadTimeTrackingSerializer, BulkDeleteTimeTrackingSerializer
 from django.db import transaction
 from .base_view_recycle import BaseViewRecycle
 from rest_framework.response import Response
@@ -10,12 +9,21 @@ from base.decorators import query_debugger
 from rest_framework.decorators import action
 from rest_framework import status
 from notification.execute import add_notification_for_history_change
+from time_tracking.custom_permission import TimeTrackingPermission
 
 
 class TimeTrackingViewSet(BaseViewRecycle):
-    serializer_class = {"default": TimeTrackingSerializer, "bulk_delete" : BulkDeleteTimeTrackingSerializer}
+    serializer_class = {"default": WriteTimeTrackingSerializer, "list" : ReadTimeTrackingSerializer, 
+                        "retrieve" : ReadTimeTrackingSerializer, "bulk_delete" : BulkDeleteTimeTrackingSerializer}
     queryset = TimeTracking.objects.all()
-
+    permission_classes = [TimeTrackingPermission]
+    
+    def get_queryset(self):
+        if self.action == "list":
+            return TimeTracking.objects.select_related('user').select_related('release')
+        return self.queryset
+    
+    
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         """

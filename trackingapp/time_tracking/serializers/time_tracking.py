@@ -1,17 +1,13 @@
 from time_tracking.models.time_tracking import TimeTracking
 from rest_framework import serializers
 from base.serializers import BulkDeleteSerializer
+from time_tracking.serializers.release import ReadReleaseSerializer
 
-class TimeTrackingSerializer(serializers.ModelSerializer):
-    
-    email_updated_by = serializers.CharField(read_only= True)
-    email_created_by = serializers.CharField(read_only= True)
-    email_user = serializers.CharField(read_only= True)
-    release_name = serializers.CharField(read_only= True)
+class WriteTimeTrackingSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = TimeTracking
-        fields = '__all__'
+        fields = ["task_id", "task_link", "start_time", "end_time", "status", "user", "release"]
 
     def validate(self, data):
         start_time = data.get('start_time') or self.instance.start_time
@@ -29,6 +25,15 @@ class TimeTrackingSerializer(serializers.ModelSerializer):
         if error_lst:
             raise serializers.ValidationError(error_lst)
         return data
+    
+class ReadTimeTrackingSerializer(serializers.ModelSerializer):
+    
+    user = serializers.SlugRelatedField(read_only= True, slug_field= "email")
+    release = ReadReleaseSerializer(read_only= True)
+    
+    class Meta:
+        model = TimeTracking
+        fields = '__all__'
     
 class BulkDeleteTimeTrackingSerializer(BulkDeleteSerializer):
     class Meta:

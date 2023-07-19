@@ -18,8 +18,3 @@ class Subcriber(BaseModel):
     release = models.ForeignKey(Release, on_delete=models.CASCADE, null=True)
     object_type = models.CharField(
         max_length=128, choices=SubcriberType.choices, null=False)
-
-    @property
-    def email_user(self):
-        return (cache.get(self.user_id) if cache.get(self.user_id)
-                else cache.get_or_set(self.user_id, self.user.email))

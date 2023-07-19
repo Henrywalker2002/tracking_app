@@ -26,7 +26,7 @@ def send_all_mail():
 
         email = EmailMessage(subject="notification", body=instance.content,
                              from_email=instance.media_from, to=[instance.media_to])
-        if instance.context_type == ContentTypeChoices.HTML:
+        if instance.content_type == ContentTypeChoices.HTML:
             email.content_subtype = 'html'
 
         try:

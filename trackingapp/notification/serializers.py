@@ -3,12 +3,10 @@ from notification.models import Notification
 from time_tracking.serializers.history import ReadHistorySerializer
 from time_tracking.models.history import History
 from time_tracking.models.time_tracking import TimeTracking
-from time_tracking.serializers.time_tracking import TimeTrackingSerializer
+from time_tracking.serializers.time_tracking import ReadTimeTrackingSerializer
 
 
 class ReadNotificationSerializer(serializers.ModelSerializer):
-    
-    email_user = serializers.CharField()
         
     class Meta:
         model = Notification
@@ -30,6 +28,6 @@ class ReadNotificationSerializer(serializers.ModelSerializer):
             if not instance:
                 ret['time_tracking'] = None 
             else :
-                ret['time_tracking'] = TimeTrackingSerializer(instance.get()).data 
+                ret['time_tracking'] = ReadTimeTrackingSerializer(instance.get()).data 
                 
         return ret

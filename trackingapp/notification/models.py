@@ -15,7 +15,3 @@ class Notification(BaseModel):
     type = models.CharField(
         max_length=128, choices=TypeNotification.choices, null=False)
     checked = models.BooleanField(default=False)
-
-    @property
-    def email_user(self):
-        return cache.get(self.user_id) if cache.get(self.user_id) else cache.get_or_set(self.user_id, self.user.email)

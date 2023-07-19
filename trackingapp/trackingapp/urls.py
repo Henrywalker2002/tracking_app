@@ -12,6 +12,7 @@ from time_tracking.views.release import ReleaseModelViewSet
 from notification.views import NotificationViewset
 from media.views import MediaViewSet
 from rest_framework import permissions
+from django.http import HttpResponse
 
 router = DefaultRouter()
 router.register(r'user', UserModelViewSet)
@@ -19,7 +20,7 @@ router.register(r'role', RoleModelViewSet)
 router.register(r'permission', PermissionModelViewSet, basename='permission')
 router.register(r'time-tracking', TimeTrackingViewSet)
 router.register(r'time-tracking-history', HistoryViewOnly, basename="history")
-router.register(r'subcriber', SubcriberModelViewSet)
+router.register(r'subscriber', SubcriberModelViewSet, basename= "subscriber")
 router.register(r'notification', NotificationViewset)
 router.register(r'media', MediaViewSet)
 router.register(r'release', ReleaseModelViewSet)
@@ -27,7 +28,11 @@ router.register(r'release', ReleaseModelViewSet)
 schema_view = get_schema_view(openapi.Info(
     "docs", default_version= "v1", public=True ), permission_classes= (permissions.AllowAny ,))
 
+def index(request):
+    return HttpResponse ('success run')
+
 urlpatterns = [
+    path('', index),
     path('docs/', schema_view.with_ui()),
     path('', include(router.urls)),
     path('login/', AuthenicationViewSet.as_view({'post': 'login'})),

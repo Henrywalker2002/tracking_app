@@ -2,19 +2,15 @@ from rest_framework import serializers
 from time_tracking.models.release import Release
 from django.db.models import Max, Min
 from time_tracking.models.time_tracking import TimeTracking
-from time_tracking.serializers.time_tracking import TimeTrackingSerializer
 
 
-class ReleaseSerializer(serializers.ModelSerializer):
+class WriteReleaseSerializer(serializers.ModelSerializer):
     """
 
     """
-    email_updated_by = serializers.CharField(read_only=True)
-    email_created_by = serializers.CharField(read_only=True)
-
     class Meta:
         model = Release
-        fields = '__all__'
+        fields = ['release', 'start_time', 'end_time', 'status', 'description']
 
     def validate(self, data):
         start_time = data.get('start_time') or self.instance.start_time
@@ -36,4 +32,9 @@ class ReleaseSerializer(serializers.ModelSerializer):
             if error_lst:
                 raise serializers.ValidationError(error_lst)
         return data
-        
+    
+class ReadReleaseSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Release
+        fields = '__all__'

@@ -6,13 +6,10 @@ from time_tracking.models.history import History
 from collections import OrderedDict
 from rest_framework.relations import PKOnlyObject
 from rest_framework.fields import SkipField
+from user.serializers import GetUserModelSerializer
 
 
 class ReadHistorySerializer(serializers.ModelSerializer):
-
-    email_user = serializers.CharField(read_only= True)
-    email_updated_by = serializers.CharField(read_only= True)
-    email_created_by = serializers.CharField(read_only= True)
     
     class Meta:
         model = History
@@ -24,12 +21,7 @@ class ReadHistorySerializer(serializers.ModelSerializer):
         """
         @query_debugger
         def get_email(id):
-            if cache.get(id):
-                return cache.get(id)
-            try :
-                return cache.get_or_set(id, User.objects.get(id =id).email or None)
-            except User.DoesNotExist as e:
-                return None
+            return User.objects.get(id =id).email or None
         
         ret = OrderedDict()
         fields = self._readable_fields
