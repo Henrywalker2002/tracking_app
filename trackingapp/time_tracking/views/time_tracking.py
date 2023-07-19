@@ -19,9 +19,14 @@ class TimeTrackingViewSet(BaseViewRecycle):
     permission_classes = [TimeTrackingPermission]
     
     def get_queryset(self):
-        if self.action == "list":
-            return TimeTracking.objects.select_related('user').select_related('release')
-        return self.queryset
+        if self.action not in ["get_item_deleted", "restore"]:
+            if self.action == "list":
+                return self.queryset.filter(is_deleted= False).select_related('user').select_related('release')
+            return self.queryset.filter(is_deleted= False)
+        else :
+            if self.action == "get_item_deleted":
+                return self.queryset.filter(is_deleted= True).select_related('user').select_related('release')
+            return self.queryset.filter(is_deleted= True)
     
     
     @transaction.atomic
