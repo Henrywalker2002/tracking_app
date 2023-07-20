@@ -35,14 +35,6 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
-    @transaction.atomic
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        from permissions.models import Role
-
-        super().save(force_insert, force_update, using, update_fields)
-        if not len(self.roles.all()):
-            self.roles.set([Role.objects.get(code_name='user')])
-
 
 class ResetCodeUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

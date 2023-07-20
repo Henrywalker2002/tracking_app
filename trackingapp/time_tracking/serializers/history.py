@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from base.decorators import query_debugger
-from django.core.cache import cache
 from user.models import User
 from time_tracking.models.history import History
 from collections import OrderedDict
 from rest_framework.relations import PKOnlyObject
 from rest_framework.fields import SkipField
-from user.serializers import GetUserModelSerializer
+from user.serializers import RetriveUserModelSerializer
 
 
 class ReadHistorySerializer(serializers.ModelSerializer):
@@ -21,7 +20,10 @@ class ReadHistorySerializer(serializers.ModelSerializer):
         """
         @query_debugger
         def get_email(id):
-            return User.objects.get(id =id).email or None
+            instance = User.objects.filter(id = id)
+            if instance:
+                return instance.get().email
+            return None
         
         ret = OrderedDict()
         fields = self._readable_fields

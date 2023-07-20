@@ -84,14 +84,18 @@ class DeleteRolesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error_ids)
         return roles
 
-class GetUserModelSerializer(serializers.ModelSerializer):
+class ListUserModelSerializer(serializers.ModelSerializer):
 
-    roles = GetRoleSerializer(many = True)
+    roles = serializers.SlugRelatedField(slug_field= 'friendly_name', read_only= True, many = True)
     
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name',
                   'last_name', 'full_name', 'phone', "roles"]
+        
+class RetriveUserModelSerializer(ListUserModelSerializer):
+    
+    roles = GetRoleSerializer(many= True)
 
 class LoginSerializer(serializers.Serializer):
     

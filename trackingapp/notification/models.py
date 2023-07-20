@@ -1,7 +1,6 @@
 from django.db import models
 from base.models import BaseModel
 from user.models import User
-from django.core.cache import cache
 
 
 class TypeNotification(models.TextChoices):

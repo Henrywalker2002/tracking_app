@@ -19,6 +19,8 @@ class RoleModelViewSet(BulkActionBaseModelViewSet):
 
     queryset = Role.objects.all()
     permission_classes = [RolePermission]
+    search_fields = ['friendly_name', 'code_name']
+    filterset_fields = ['code_name']
     
     def get_queryset(self):
         if self.action == "list":
@@ -60,3 +62,5 @@ class PermissionModelViewSet(BulkActionBaseModelViewSet):
     
     queryset = Permission.objects.all()
     permission_classes = [RolePermission]
+    search_fields = ['friendly_name', 'code_name']
+    filterset_fields = ['code_name']

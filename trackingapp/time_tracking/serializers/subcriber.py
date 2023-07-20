@@ -2,8 +2,8 @@ from rest_framework import serializers
 from time_tracking.models.subcriber import Subcriber, SubcriberType
 from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.models.release import Release
-from user.serializers import GetUserModelSerializer
-from time_tracking.serializers.time_tracking import ReadTimeTrackingSerializer
+from user.serializers import RetriveUserModelSerializer
+from time_tracking.serializers.time_tracking import ListTimeTrackingSerializer
 from time_tracking.serializers.release import ReadReleaseSerializer
 
 class WriteSubcriberSerializer(serializers.ModelSerializer):
@@ -37,8 +37,8 @@ class WriteSubcriberSerializer(serializers.ModelSerializer):
     
 class ReadSubcriberSerializer(serializers.ModelSerializer):
     
-    user = GetUserModelSerializer(read_only= True)
-    time_tracking = ReadTimeTrackingSerializer(read_only=True)
+    user = RetriveUserModelSerializer(read_only= True)
+    time_tracking = ListTimeTrackingSerializer(read_only=True)
     release = ReadReleaseSerializer(read_only= True)
     
     class Meta:

@@ -2,10 +2,10 @@ from rest_framework.permissions import BasePermission
 
 class CustomPermission(BasePermission):
     """
-    You have to wirte verify_permission(self, action, view) to use this class 
+    You have to impletament verify_permission(self, action, view) to use this class 
     """
     def verify_permisison(self , action, request, view):
-        assert "Child of CustomPermisison must have verify_permission funcion"
+        raise "Child of CustomPermisison must have verify_permission funcion"
     
     def has_permission(self, request, view):
         

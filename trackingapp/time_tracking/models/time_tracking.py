@@ -3,7 +3,6 @@ from django.db import models
 from user.models import User
 from base.models import BaseModel
 from datetime import datetime
-from django.core.cache import cache
 from trackingapp.custom_middleware import get_current_user
 from django.db import transaction
 from .release import Release

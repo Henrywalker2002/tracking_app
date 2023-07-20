@@ -3,7 +3,6 @@ from time_tracking.models.subcriber import Subcriber, SubcriberType
 from admin_app.task_queue import add_to_queue
 
 
-@add_to_queue
 def add_notification_for_history_change(history_instance):
     """
     Add notification for user who subcribed time tracking

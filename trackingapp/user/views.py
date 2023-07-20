@@ -1,4 +1,4 @@
-from user.serializers import (CreateUserModelSerializer, GetUserModelSerializer,
+from user.serializers import (CreateUserModelSerializer, ListUserModelSerializer, RetriveUserModelSerializer, 
                           LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, 
                           UpdateUserSerializer, ForgotPasswordSerializer, ResetPassword)
 from .models import User
@@ -16,7 +16,7 @@ from functools import reduce
 from base.authentication import CustomAuthentication
 from permissions.models import Role
 from base.decorators import query_debugger
-from media.execute import send_code
+from user.execute import send_code
 from rest_framework import viewsets
 import string
 import random
@@ -24,13 +24,18 @@ from user.models import ResetCodeUser
 from django.utils import timezone
 from datetime import timedelta
 
+
 class UserModelViewSet(CustomModelViewSetBase):
-    serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer,
+    serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer, 
+                        "list" : ListUserModelSerializer, "retrive" : RetriveUserModelSerializer,
                         "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
-                        "default": GetUserModelSerializer, "delete_role" : DeleteRolesSerializer}
+                        "default": RetriveUserModelSerializer, "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
     permission_classes = [UserPermission]
     authentication_classes = [CustomAuthentication]
+    search_fields = ['first_name', 'last_name', 'email']
+    filterset_fields = ['email', 'phone']
+    
     
     @action(methods=['patch'], detail=True, url_path="update-role")
     def update_role(self, request, *args, **kwargs):
@@ -108,21 +113,21 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
             request, username=serializer.validated_data['email'], password=serializer.validated_data['password'])
         if user:
             if not user.is_active:
-                return Response("user is not active")
+                return Response("user is not active", status= status.HTTP_401_UNAUTHORIZED)
             login(request, user)
             permission_code_names = reduce(lambda prev, curr: prev + list(
                     curr.permission.all().values_list('code_name', flat=True)), user.roles.all(), [])
             user_data = self.get_serializer(user).data 
             user_data.setdefault('permission_code_names', permission_code_names)
             return Response(user_data)
-        return Response("wrong username or password")
+        return Response("wrong username or password", status= status.HTTP_401_UNAUTHORIZED)
 
     @action(methods=['post'], detail=False, url_path="logout")
     def logout(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(methods= ['patch'], detail= False, url_path='send-code')
+    @action(methods= ['post'], detail= False, url_path='send-code')
     def send_code(self, request):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)

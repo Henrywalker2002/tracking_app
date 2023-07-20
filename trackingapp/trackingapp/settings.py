@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework', 
     'rest_framework_swagger',
     'drf_yasg',
+    'django.contrib.postgres',
+    'django_filters',
     'user.apps.UserConfig', 
     'permissions',
     'time_tracking',
@@ -135,6 +137,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES' : ("rest_framework.permissions.IsAuthenticated", ),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'base.authentication.CustomAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend', 
+        'rest_framework.filters.SearchFilter'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination', 
     'PAGE_SIZE' : 100,

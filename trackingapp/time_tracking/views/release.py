@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from time_tracking.models.time_tracking import TimeTracking
 from rest_framework.response import Response
 from time_tracking.custom_permission import TimeTrackingPermission
+from time_tracking.filters.release import ReleaseFilter
 
 class ReleaseModelViewSet(BaseViewRecycle):
     
@@ -12,3 +13,5 @@ class ReleaseModelViewSet(BaseViewRecycle):
     serializer_class = {"default" : WriteReleaseSerializer, "list" : ReadReleaseSerializer, 
                         "retrieve" : ReadReleaseSerializer}
     permission_classes = [TimeTrackingPermission]
+    filterset_class = ReleaseFilter
+    search_fields = ['@release', '@description']

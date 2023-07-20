@@ -8,13 +8,13 @@ from time_tracking.custom_permission import TimeTrackingPermission
 
 class SubcriberModelViewSet(GenericViewSet, mixins.CreateModelMixin, mixins.DestroyModelMixin,
                             GetByTimeTrackingIdMixin, GetByUserIdMixin):
-
-    def get_serializer_class(self):
-        if self.action in self.serializer_class.keys():
-            return self.serializer_class[self.action]
-        return self.serializer_class['default']
     
     serializer_class = {"default" : WriteSubcriberSerializer, "list" : ReadSubcriberSerializer, 
                           "retrieve" : ReadSubcriberSerializer}
     queryset = Subcriber.objects.all()
     permission_classes = [TimeTrackingPermission]
+    
+    def get_serializer_class(self):
+        if self.action in self.serializer_class.keys():
+            return self.serializer_class[self.action]
+        return self.serializer_class['default']

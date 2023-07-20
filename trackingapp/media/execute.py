@@ -42,11 +42,3 @@ def send_all_mail():
     logging.info(f"send mail success {success_ids} error {error_ids}")
 
     connection.close()
-
-def send_code(code, email):
-    dic = {"code" : code}
-    htmly = get_template('send_new_password.html')
-    body = htmly.render(dic)
-    msg = EmailMessage("reset password", body, settings.EMAIL_HOST_USER, [email])
-    msg.content_subtype = 'html'
-    msg.send(fail_silently= True)
