@@ -28,7 +28,7 @@ def check_task_over_deadline():
 @add_to_queue
 def process_history(current_time_tracking, old_instance, new_instance):
     excluded_fields = ['id', 'created_at',
-                       'modified_at', 'created_by', 'updated_by', "email_user"]
+                       'modified_at', 'created_by', 'updated_by']
     change_lst = {}
     for key in old_instance.keys():
         if key in excluded_fields:
@@ -36,8 +36,10 @@ def process_history(current_time_tracking, old_instance, new_instance):
         if old_instance[key] != new_instance[key]:
             # remove old subcriber
             if key == 'user':
-                subcriber_instance = Subcriber.objects.filter(user_id=old_instance.get('user'), 
+                subcriber_instance = Subcriber.objects.filter(user_id=old_instance.get('user_id'), 
                                     time_tracking_id=old_instance.get('id'), object_type = SubcriberType.TASK)
+                change_lst[key] = {"old_value": str(old_instance[key].get('id')), "new_value": str(new_instance[key].get('id'))}
+                continue
                 if subcriber_instance:
                     subcriber_instance.delete()
             elif key == "release":
