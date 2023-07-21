@@ -1,4 +1,4 @@
-from user.serializers import (CreateUserModelSerializer, ListUserModelSerializer, RetriveUserModelSerializer, 
+from user.serializers import (CreateUserModelSerializer, ReadUserSummarySerializer, ReadUserDetailSerializer, 
                           LoginSerializer, UpdateRolesSerializer, DeleteRolesSerializer, 
                           UpdateUserSerializer, ForgotPasswordSerializer, ResetPassword)
 from .models import User
@@ -23,13 +23,14 @@ import random
 from user.models import ResetCodeUser
 from django.utils import timezone
 from datetime import timedelta
+from django.db import transaction
 
 
 class UserModelViewSet(CustomModelViewSetBase):
     serializer_class = {"create": CreateUserModelSerializer, "update": UpdateUserSerializer, 
-                        "list" : ListUserModelSerializer, "retrive" : RetriveUserModelSerializer,
+                        "list" : ReadUserSummarySerializer, "retrieve" : ReadUserDetailSerializer,
                         "partial_update": UpdateUserSerializer, "update_role": UpdateRolesSerializer,
-                        "default": RetriveUserModelSerializer, "delete_role" : DeleteRolesSerializer}
+                        "default": ReadUserDetailSerializer, "delete_role" : DeleteRolesSerializer}
     queryset = User.objects.all()
     permission_classes = [UserPermission]
     authentication_classes = [CustomAuthentication]
@@ -44,13 +45,15 @@ class UserModelViewSet(CustomModelViewSetBase):
         """
         return super().update(request, *args, **kwargs)
     
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
-        user = User(**serializer.validated_data)
+        serializer.save()
+        user = serializer.instance
         user.set_password(user.password)
         user.save()
-        serializer_return = self.get_serializer(user)
+        serializer_return = self.get_serializer(user, is_get = True)
         return Response(data = serializer_return.data, status= 201)
     
     def update(self, request, *args, **kwargs):
@@ -71,7 +74,9 @@ class UserModelViewSet(CustomModelViewSetBase):
             instance.set_password(password)
             instance.save()
 
-        return Response(serializer.data)
+        serializer_return = self.get_serializer(instance, is_get = True)
+        
+        return Response(serializer_return.data)
 
     @action(detail=True, url_path="get-role")
     def get_role(self, request, pk):
@@ -86,7 +91,8 @@ class UserModelViewSet(CustomModelViewSetBase):
         serializer = self.get_serializer(instance, request.data, partial = True)
         serializer.is_valid(raise_exception = True)
         [instance.roles.remove(Role.objects.get(id = id)) for id in request.data.get('roles')]
-        return Response()
+        serializer_return = self.get_serializer(instance, is_get= True)
+        return Response(serializer_return.data)
 
 class AuthenicationViewSet(viewsets.GenericViewSet):
     serializer_class = {"login": LoginSerializer,"send_code" : ForgotPasswordSerializer , 

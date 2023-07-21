@@ -21,13 +21,17 @@ class BulkDetelePermissionSerializer(BulkDeleteSerializer):
         model = Permission
         fields = ['ids']
 
-class GetRoleSerializer(serializers.ModelSerializer):
+class ReadRoleDetailSerializer(serializers.ModelSerializer):
 
     permission = PermissionSerializer(many = True, read_only= True)
     
     class Meta:
         model = Role
         fields = ['id', 'code_name', 'friendly_name', 'permission']
+        
+class ReadRoleSummarySerializer(ReadRoleDetailSerializer):
+    
+    permission = serializers.SlugRelatedField(slug_field='code_name', read_only= True, many = True)
         
 
 class WriteRoleSerializer(serializers.ModelSerializer):

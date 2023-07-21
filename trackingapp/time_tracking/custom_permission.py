@@ -15,6 +15,12 @@ class TimeTrackingPermission(CustomPermission):
             return True        
 
     def has_object_permission(self, request, view, obj):
+        permission_lst = request.user.permission_code_names
+        
+        for perm in permission_lst:
+            if perm == "all":
+                return True 
+        
         if isinstance(obj, Subcriber):
             return obj.user_id == request.user.id 
         return True

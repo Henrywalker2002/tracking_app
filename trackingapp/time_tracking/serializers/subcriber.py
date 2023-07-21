@@ -2,8 +2,8 @@ from rest_framework import serializers
 from time_tracking.models.subcriber import Subcriber, SubcriberType
 from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.models.release import Release
-from user.serializers import RetriveUserModelSerializer
-from time_tracking.serializers.time_tracking import ListTimeTrackingSerializer
+from user.serializers import ReadUserSummarySerializer
+from time_tracking.serializers.time_tracking import ReadTimeTrackingSummarySerializer
 from time_tracking.serializers.release import ReadReleaseSerializer
 
 class WriteSubcriberSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class WriteSubcriberSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Subcriber
-        fields = ['user', 'time_tracking', 'release']
+        fields = ['user', 'time_tracking', 'release', 'object_type']
 
     def validate(self, data):
         type = data.get('object_type')
@@ -24,7 +24,7 @@ class WriteSubcriberSerializer(serializers.ModelSerializer):
                                                       user= data.get('user'), object_type= SubcriberType.RELEASE)
             if instance:
                 raise serializers.ValidationError(
-                    f"user {data.get('user')} have already subcribed to release {data.get('release')}")
+                    f"user '{data.get('user')}' have already subcribed to release '{data.get('release')}'")
         else :
             if not data.get('time_tracking'):
                 raise serializers.ValidationError(f"object_type = {SubcriberType.TASK} must have field time_tracking")
@@ -37,8 +37,8 @@ class WriteSubcriberSerializer(serializers.ModelSerializer):
     
 class ReadSubcriberSerializer(serializers.ModelSerializer):
     
-    user = RetriveUserModelSerializer(read_only= True)
-    time_tracking = ListTimeTrackingSerializer(read_only=True)
+    user = ReadUserSummarySerializer(read_only= True)
+    time_tracking = ReadTimeTrackingSummarySerializer(read_only=True)
     release = ReadReleaseSerializer(read_only= True)
     
     class Meta:

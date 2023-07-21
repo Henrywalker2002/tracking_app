@@ -98,39 +98,7 @@ class BulkDeleteMixin:
         serializer.is_valid(raise_exception = True)
         queryset.filter(id__in = serializer.data['ids']).delete()
         return Response(status= status.HTTP_204_NO_CONTENT)
-    
-class BulkUpdateMixin:
-    """
-    Update field pass by request.body['objects'] + updated_by 
-    """    
-    
-    @action(methods=['PUT'], detail=False, url_path='bulk-update')
-    def bulk_update(self, request, *args, **kwargs):
-        instance_lst = []
-        fields = {'updated_by', 'modified_at'}
-            
-        for obj in request.data:
-            
-            instance = self.get_queryset().filter(id = obj.get('id'))
-            if not instance:
-                raise serializers.ValidationError(f"id {obj.get('id')} is not exist")
-            instance = instance.get()
-            
-            serializer = self.get_serializer(instance ,data = obj)
-            serializer.is_valid(raise_exception = True)
-            
-            for key,value in obj.items():
-                # if in 4 field auto add, skip 
-                if key in ['updated_by', 'modified_at', 'created_by', 'created_at', 'id']:
-                    continue
-                setattr(instance, key, value)
-                fields.add(key)
-            setattr(instance, 'updated_by', self.request.user)
-            setattr(instance, 'modified_at', datetime.datetime.now(tz = timezone.utc))
-            instance_lst.append(instance)
-        self.get_serializer_class().Meta.model.objects.bulk_update(instance_lst, fields)
-        return_serializer = self.get_serializer(instance_lst, many = True)
-        return Response(return_serializer.data)
+
         
 class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkDeleteMixin):
     """
@@ -138,52 +106,3 @@ class BulkActionBaseModelViewSet(CustomModelViewSetBase, BulkCreateMixin, BulkDe
     Bulk detele, bulk create
     """
     pass 
-    
-
-class GetByUserIdMixin: 
-    """
-    have action get by user id 
-    """
-    @action(detail= False, url_path="get-by-user-id")
-    def get_by_user_id(self, request):
-        # if many notification ? 
-        param = request.GET 
-        if not param.get('id'):
-            return Response(data = {"id" : f'must have param query id'}, status= status.HTTP_400_BAD_REQUEST)
-        try: 
-            id = UUID(param.get('id'))
-            instance_lst = self.get_queryset().filter(user_id = id).order_by('-created_at')
-            
-            page = self.paginate_queryset(instance_lst)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-            serializer = self.get_serializer(instance_lst, many=True)
-            return Response(serializer.data)
-
-        except ValueError as e:
-            return Response(data={"id": f"id {param.get('id')} is not valid"}, status= status.HTTP_400_BAD_REQUEST)
-
-class GetByTimeTrackingIdMixin:
-    """
-    have action get by time tracking id 
-    """
-    
-    @action(detail= False, url_path= "get-by-time-tracking-id")
-    def get_by_time_tracking_id(self, request):
-        param = request.GET
-        try:
-            id = UUID(param.get('id'))
-            instance_lst = self.get_queryset().filter(time_tracking_id=id)
-            
-            page = self.paginate_queryset(instance_lst)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-            serializer = self.get_serializer(instance_lst, many=True)
-            return Response(serializer.data)
-        
-        except ValueError as e:
-            return Response(data={"id": f"id {param.get('id')} is not valid"}, status=400)

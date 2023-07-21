@@ -7,12 +7,13 @@ from django.db import transaction
 from functools import reduce
 import logging
 from trackingapp.custom_middleware import get_current_request_id
-from permissions.serializers import GetRoleSerializer
+from permissions.serializers import ReadRoleSummarySerializer
 
 
 class CreateUserModelSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
+    roles = serializers.PrimaryKeyRelatedField(required= False, queryset = Role.objects.all(), many = True)
 
     class Meta:
         model = User
@@ -84,7 +85,7 @@ class DeleteRolesSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error_ids)
         return roles
 
-class ListUserModelSerializer(serializers.ModelSerializer):
+class ReadUserSummarySerializer(serializers.ModelSerializer):
 
     roles = serializers.SlugRelatedField(slug_field= 'friendly_name', read_only= True, many = True)
     
@@ -93,9 +94,9 @@ class ListUserModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name',
                   'last_name', 'full_name', 'phone', "roles"]
         
-class RetriveUserModelSerializer(ListUserModelSerializer):
+class ReadUserDetailSerializer(ReadUserSummarySerializer):
     
-    roles = GetRoleSerializer(many= True)
+    roles = ReadRoleSummarySerializer(many= True, read_only= True)
 
 class LoginSerializer(serializers.Serializer):
     

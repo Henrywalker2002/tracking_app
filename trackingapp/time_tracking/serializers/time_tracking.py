@@ -2,7 +2,7 @@ from time_tracking.models.time_tracking import TimeTracking
 from rest_framework import serializers
 from base.serializers import BulkDeleteSerializer
 from time_tracking.serializers.release import ReadReleaseSerializer
-from user.serializers import ListUserModelSerializer
+from user.serializers import ReadUserSummarySerializer
 
 class WriteTimeTrackingSerializer(serializers.ModelSerializer):
     
@@ -27,7 +27,7 @@ class WriteTimeTrackingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(error_lst)
         return data
     
-class ListTimeTrackingSerializer(serializers.ModelSerializer):
+class ReadTimeTrackingSummarySerializer(serializers.ModelSerializer):
     
     user = serializers.SlugRelatedField(read_only= True, slug_field= "email")
     release = serializers.SlugRelatedField(read_only= True, slug_field= "release")
@@ -36,9 +36,9 @@ class ListTimeTrackingSerializer(serializers.ModelSerializer):
         model = TimeTracking
         fields = '__all__'
         
-class RetrieveTimeTrackingSerializer(ListTimeTrackingSerializer):
+class ReadTimeTrackingDetailSerializer(ReadTimeTrackingSummarySerializer):
     
-    user = ListUserModelSerializer(read_only= True)
+    user = ReadUserSummarySerializer(read_only= True)
     release = ReadReleaseSerializer(read_only= True)
     
 class BulkDeleteTimeTrackingSerializer(BulkDeleteSerializer):

@@ -2,45 +2,72 @@ from rest_framework import serializers
 from base.decorators import query_debugger
 from user.models import User
 from time_tracking.models.history import History
+from time_tracking.models.release import Release
+from time_tracking.serializers.time_tracking import ReadTimeTrackingSummarySerializer
+from time_tracking.serializers.release import ReadReleaseSerializer
 from collections import OrderedDict
 from rest_framework.relations import PKOnlyObject
 from rest_framework.fields import SkipField
-from user.serializers import RetriveUserModelSerializer
+from user.serializers import ReadUserSummarySerializer
 
 
-class ReadHistorySerializer(serializers.ModelSerializer):
+class HistorySummarySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = History
-        fields = '__all__'
+        exclude = ['created_by', 'updated_by']
+        
+    def get_user(self, id):
+        instance = User.objects.filter(id = id)
+        if instance:
+            return instance.get().email
+        return None
+    
+    def get_release(self, id):
+        instance = Release.objects.filter(id = id)
+        if instance:
+            return instance.get().release
+        return None
+         
         
     def to_representation(self, instance):
         """
         custom to represent user email instead of user id 
         """
-        @query_debugger
-        def get_email(id):
-            instance = User.objects.filter(id = id)
-            if instance:
-                return instance.get().email
-            return None
+        ret = super().to_representation(instance)
         
-        ret = OrderedDict()
-        fields = self._readable_fields
-        for field in fields:
-            try:
-                attribute = field.get_attribute(instance)
-            except SkipField:
-                continue
-            check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
-            if check_for_none is None:
-                ret[field.field_name] = None
-            else:
-                if field.field_name == "change_detection":
-                    if attribute.get('user'):
-                        new_value = get_email(attribute.get('user').get('new_value'))
-                        old_value = get_email(attribute.get('user').get('old_value'))
-                        attribute['user'] = {"new_value" : new_value, "old_value" : old_value}
-                        attribute['user_email'] = attribute.pop('user')
-                ret[field.field_name] = field.to_representation(attribute)
+        change_detection = ret.get('change_detection')
+        if not change_detection:
+            return ret
+        if 'user' in change_detection.keys():
+            change_detection['user']['old_value'] = self.get_user(change_detection['user'].get('old_value'))
+            change_detection['user']['new_value'] = self.get_user(change_detection['user'].get('new_value'))
+        if 'release' in change_detection.keys():
+            change_detection['release']['old_value'] = self.get_release(change_detection['release'].get('old_value'))
+            change_detection['release']['new_value'] = self.get_release(change_detection['release'].get('new_value'))
+        ret['change_detection'] = change_detection
+        
         return ret
+
+class HistoryDetailSerializer(HistorySummarySerializer):
+    """
+    Get more detail for user, release, time_tracking
+    """
+    time_tracking = ReadTimeTrackingSummarySerializer(read_only= True)
+    
+    class Meta:
+        model = History
+        exclude = ['created_by', 'updated_by']
+        
+    def get_user(self, id):
+        instance = User.objects.filter(id = id)
+        if instance:
+            return ReadUserSummarySerializer(instance.get()).data
+        return None
+    
+    def get_release(self, id):
+        instance = Release.objects.filter(id = id)
+        if instance:
+            return ReadReleaseSerializer(instance.get()).data
+        return None
+        

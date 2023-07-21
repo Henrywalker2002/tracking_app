@@ -1,12 +1,27 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
-from base.views import GetByTimeTrackingIdMixin, GetByUserIdMixin
-from rest_framework import mixins
-from time_tracking.serializers.history import ReadHistorySerializer
+from rest_framework import mixins, response, status
+from time_tracking.serializers.history import HistoryDetailSerializer, HistorySummarySerializer
 from time_tracking.models.history import History
 from time_tracking.custom_permission import TimeTrackingPermission
 
-class HistoryViewOnly(GenericViewSet, mixins.RetrieveModelMixin, GetByTimeTrackingIdMixin, GetByUserIdMixin):
 
-    serializer_class = ReadHistorySerializer
+class HistoryViewOnly(GenericViewSet, mixins.RetrieveModelMixin, mixins.ListModelMixin):
+
+    serializer_class = {"retrieve" : HistoryDetailSerializer, "default" : HistorySummarySerializer}
     queryset = History.objects.all()
     permission_classes = [TimeTrackingPermission]
+    filterset_fields = ['time_tracking_id']
+    
+    def get_serializer_class(self):
+        if self.action in self.serializer_class.keys():
+            return self.serializer_class[self.action]
+        return self.serializer_class['default']
+    
+    def list(self, request, *args, **kwargs):
+        param = request.GET 
+        if 'time_tracking_id' not in param.keys():
+            return response.Response({"detail" : "Not Found"}, status= status.HTTP_404_NOT_FOUND)
+        return super().list(request, *args, **kwargs)
+    
+    
+    

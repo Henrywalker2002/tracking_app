@@ -1,7 +1,7 @@
 from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.models.history import History
 from time_tracking.models.subcriber import Subcriber, SubcriberType
-from time_tracking.serializers.time_tracking import WriteTimeTrackingSerializer, ListTimeTrackingSerializer,RetrieveTimeTrackingSerializer, BulkDeleteTimeTrackingSerializer
+from time_tracking.serializers.time_tracking import WriteTimeTrackingSerializer, ReadTimeTrackingDetailSerializer,ReadTimeTrackingSummarySerializer, BulkDeleteTimeTrackingSerializer
 from django.db import transaction
 from .base_view_recycle import BaseViewRecycle
 from rest_framework.response import Response
@@ -15,9 +15,9 @@ from time_tracking.filters.time_tracking import TimeTrackingFilter
 
 
 class TimeTrackingViewSet(BaseViewRecycle):
-    serializer_class = {"default": WriteTimeTrackingSerializer, "list" : ListTimeTrackingSerializer, 
-                        "retrieve" : RetrieveTimeTrackingSerializer, "bulk_delete" : BulkDeleteTimeTrackingSerializer}
-    queryset = TimeTracking.objects.all()
+    serializer_class = {"default": WriteTimeTrackingSerializer, "list" : ReadTimeTrackingSummarySerializer, 
+                        "retrieve" : ReadTimeTrackingDetailSerializer, "bulk_delete" : BulkDeleteTimeTrackingSerializer}
+    queryset = TimeTracking.objects.all() 
     permission_classes = [TimeTrackingPermission]
     filterset_class = TimeTrackingFilter
     

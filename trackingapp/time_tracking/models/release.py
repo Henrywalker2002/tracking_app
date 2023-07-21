@@ -17,3 +17,7 @@ class Release(BaseModel):
         max_length=128, choices=ReleaseStatus.choices, null=False, default=ReleaseStatus.TODO)
     description = models.TextField()
     is_deleted = models.BooleanField(default=False, null=False)
+
+    def __str__(self):
+        return self.release
+    

@@ -18,6 +18,8 @@ def check_task_over_deadline():
             end_time__lte = timezone.now()).exclude(status=StatusTimeTracking.DONE)
         add_notification_for_release(expired_task)
     
+    inner()
+    
     schedule.every().day.at("00:00").do(inner)
     
     while True:

@@ -13,13 +13,13 @@ class WriteMediaSerializer(serializers.ModelSerializer):
         model = Media
         fields = ['media_from', 'media_to', 'content', 'content_type', 'sending_method']
         
-class ListMediaSerializer(serializers.ModelSerializer):
+class ReadMediaSummarySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Media 
         exclude = ['content']
         
-class RetriveMediaSerializer(serializers.ModelSerializer):
+class ReadMediaDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Media
