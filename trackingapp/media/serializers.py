@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from media.models import Media, MediaStatusChoices
+from user.serializers import ReadSortUserSerializer
 
         
 class WriteMediaSerializer(serializers.ModelSerializer):
@@ -15,13 +16,16 @@ class WriteMediaSerializer(serializers.ModelSerializer):
         
 class ReadMediaSummarySerializer(serializers.ModelSerializer):
     
+    created_by = ReadSortUserSerializer(read_only= True)
+    updated_by = ReadSortUserSerializer(read_only= True)
+    
     class Meta:
         model = Media 
         exclude = ['content']
         
-class ReadMediaDetailSerializer(serializers.ModelSerializer):
+class ReadMediaDetailSerializer(ReadMediaSummarySerializer):
     
     class Meta:
         model = Media
-        fields= '__all__'
+        fields = '__all__'
     

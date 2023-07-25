@@ -16,7 +16,7 @@ from functools import reduce
 from base.authentication import CustomAuthentication
 from permissions.models import Role
 from base.decorators import query_debugger
-from user.execute import send_code
+from user.execute import send_reset_password_code, send_new_password
 from rest_framework import viewsets
 import string
 import random
@@ -24,6 +24,7 @@ from user.models import ResetCodeUser
 from django.utils import timezone
 from datetime import timedelta
 from django.db import transaction
+import uuid
 
 
 class UserModelViewSet(CustomModelViewSetBase):
@@ -51,8 +52,11 @@ class UserModelViewSet(CustomModelViewSetBase):
         serializer.is_valid(raise_exception = True)
         serializer.save()
         user = serializer.instance
-        user.set_password(user.password)
+        password = str(uuid.uuid4())[:8]
+        user.set_password(password)
         user.save()
+        send_new_password(password, user.email)
+        
         serializer_return = self.get_serializer(user, is_get = True)
         return Response(data = serializer_return.data, status= 201)
     
@@ -121,27 +125,27 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
             if not user.is_active:
                 return Response("user is not active", status= status.HTTP_401_UNAUTHORIZED)
             login(request, user)
-            permission_code_names = reduce(lambda prev, curr: prev + list(
-                    curr.permission.all().values_list('code_name', flat=True)), user.roles.all(), [])
+            permission_code_names = reduce(lambda prev, curr: prev | set(
+                    curr.permission.all().values_list('code_name', flat=True)), user.roles.all(), set())
             user_data = self.get_serializer(user).data 
             user_data.setdefault('permission_code_names', permission_code_names)
             return Response(user_data)
-        return Response("wrong username or password", status= status.HTTP_401_UNAUTHORIZED)
+        return Response({"messsage" : "wrong username or password"}, status= status.HTTP_401_UNAUTHORIZED)
 
     @action(methods=['post'], detail=False, url_path="logout")
     def logout(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @action(methods= ['post'], detail= False, url_path='send-code')
+    @action(methods= ['post'], detail= False, url_path='forgot-password')
     def send_code(self, request):
         serializer = self.get_serializer(data = request.data)
         serializer.is_valid(raise_exception = True)
-        code = random.randint(100000, 999999)
+        code = str(uuid.uuid4())[:6]
         obj, created = ResetCodeUser.objects.update_or_create(
             email = serializer.data.get('email'), defaults = {"code" : code, "expired_time" : timezone.now() + timedelta(days= 1)})
-        send_code(code, serializer.data.get('email'))
-        return Response(status= status.HTTP_204_NO_CONTENT)
+        send_reset_password_code(code, serializer.data.get('email'))
+        return Response({"message" : "success"} ,status= status.HTTP_200_OK)
 
     @action(methods= ['patch'], detail= False, url_path='reset-password')
     def reset_password(self, request):
@@ -154,6 +158,6 @@ class AuthenicationViewSet(viewsets.GenericViewSet):
             user.set_password(serializer.data.get('password'))
             user.save()
             instance.delete()
-            return Response(status= status.HTTP_204_NO_CONTENT)
+            return Response({"message" : "success"} ,status= status.HTTP_200_OK)
         else :
-            return Response(data = {"detail" : "wrong code or code expired"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data = {"code" : ["wrong code or code expired"]}, status=status.HTTP_400_BAD_REQUEST)

@@ -7,7 +7,7 @@ class MediaFilter(filter.FilterSet):
     
     class Meta:
         model = Media
-        fields = ['media_from', 'media_to', 'content_type', 'sending_method', 'status']
+        fields = ['media_from', 'media_to', 'content_type', 'sending_method', 'status', 'created_by']
         filter_overrides = {
             JSONField : {
                 "filter_class" : filter.CharFilter,

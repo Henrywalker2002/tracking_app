@@ -30,5 +30,13 @@ def add_notification_for_release(tasks):
             user_lst = Subcriber.objects.filter(
                 object_type=SubcriberType.RELEASE, release_id=release_id).values_list('user_id', flat=True)
         instance_lst += [Notification(object_id=task.id, user_id=user_id,
-                                      type=TypeNotification.WORK_FLOW) for user_id in user_lst]
+                                      type=TypeNotification.EXPIRED_TASK) for user_id in user_lst]
     Notification.objects.bulk_create(instance_lst)
+
+
+@add_to_queue
+def add_notification_for_assign_task(task):
+    """
+    add notification for user assigned task 
+    """
+    Notification.objects.create(user = task.user, object_id= task.id, type = TypeNotification.ASSIGN_TASK)

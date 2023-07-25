@@ -4,11 +4,11 @@ from user.models import User
 from time_tracking.models.history import History
 from time_tracking.models.release import Release
 from time_tracking.serializers.time_tracking import ReadTimeTrackingSummarySerializer
-from time_tracking.serializers.release import ReadReleaseSerializer
+from time_tracking.serializers.release import ReadSortReleaseSerailizer
 from collections import OrderedDict
 from rest_framework.relations import PKOnlyObject
 from rest_framework.fields import SkipField
-from user.serializers import ReadUserSummarySerializer
+from user.serializers import ReadSortUserSerializer
 
 
 class HistorySummarySerializer(serializers.ModelSerializer):
@@ -20,13 +20,13 @@ class HistorySummarySerializer(serializers.ModelSerializer):
     def get_user(self, id):
         instance = User.objects.filter(id = id)
         if instance:
-            return instance.get().email
+            return ReadSortUserSerializer(instance.get()).data
         return None
     
     def get_release(self, id):
         instance = Release.objects.filter(id = id)
         if instance:
-            return instance.get().release
+            return ReadSortReleaseSerailizer(instance.get()).data
         return None
          
         
@@ -51,23 +51,9 @@ class HistorySummarySerializer(serializers.ModelSerializer):
 
 class HistoryDetailSerializer(HistorySummarySerializer):
     """
-    Get more detail for user, release, time_tracking
+    Get more detail for time_tracking
     """
     time_tracking = ReadTimeTrackingSummarySerializer(read_only= True)
-    
-    class Meta:
-        model = History
-        exclude = ['created_by', 'updated_by']
         
-    def get_user(self, id):
-        instance = User.objects.filter(id = id)
-        if instance:
-            return ReadUserSummarySerializer(instance.get()).data
-        return None
-    
-    def get_release(self, id):
-        instance = Release.objects.filter(id = id)
-        if instance:
-            return ReadReleaseSerializer(instance.get()).data
-        return None
+
         

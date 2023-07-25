@@ -5,7 +5,8 @@ from user.models import User
 
 class TypeNotification(models.TextChoices):
     TIME_TRACKING_HISTORY = "TIME_TRACKING_HISTORY", "TIME_TRACKING_HISTORY"
-    WORK_FLOW = "WORK_FLOW", "WORK_FLOW"
+    EXPIRED_TASK = "EXPIRED_TASK", "EXPIRED_TASK"
+    ASSIGN_TASK = "ASSIGN_TASK", "ASSIGN_TASK"
 
 
 class Notification(BaseModel):

@@ -1,37 +1,33 @@
 from rest_framework import serializers
-from .models import Role, Permission
-from django.db import connection, reset_queries
-from user.models import User
+from permissions.models import Role, Permission
 from base.serializers import BulkDeleteSerializer
-from functools import reduce
 import uuid
+from permissions.serializers.permission import PermissionSerializer
+from user.models import User 
 
-class PermissionSerializer(serializers.ModelSerializer):
-
-    id = serializers.UUIDField(read_only= True)
+class ReadSortUserSerializer(serializers.ModelSerializer):
     
     class Meta:
-        model = Permission
-        fields = ['code_name', 'friendly_name', 'id']
-
-
-class BulkDetelePermissionSerializer(BulkDeleteSerializer):
-
-    class Meta:
-        model = Permission
-        fields = ['ids']
+        model = User
+        fields = ['id', 'email', 'full_name']    
+        
 
 class ReadRoleDetailSerializer(serializers.ModelSerializer):
 
     permission = PermissionSerializer(many = True, read_only= True)
+    created_by = ReadSortUserSerializer(read_only= True)
+    updated_by = ReadSortUserSerializer(read_only= True)
     
     class Meta:
         model = Role
-        fields = ['id', 'code_name', 'friendly_name', 'permission']
+        fields = '__all__'
         
-class ReadRoleSummarySerializer(ReadRoleDetailSerializer):
+
+class ReadRoleSummarySerializer(serializers.ModelSerializer):
     
-    permission = serializers.SlugRelatedField(slug_field='code_name', read_only= True, many = True)
+    class Meta:
+        model = Role 
+        fields = ['id', 'code_name', 'friendly_name']
         
 
 class WriteRoleSerializer(serializers.ModelSerializer):

@@ -36,14 +36,15 @@ def process_history(current_time_tracking, old_instance, new_instance):
         if key in excluded_fields:
             continue
         if old_instance[key] != new_instance[key]:
-            # remove old subcriber
             if key == 'user':
+                # user handle 
                 subcriber_instance = Subcriber.objects.filter(user_id=old_instance.get('user_id'), 
                                     time_tracking_id=old_instance.get('id'), object_type = SubcriberType.TASK)
                 change_lst[key] = {"old_value": str(old_instance[key].get('id')), "new_value": str(new_instance[key].get('id'))}
-                continue
+                
                 if subcriber_instance:
                     subcriber_instance.delete()
+                continue 
             elif key == "release":
                 change_lst[key] = {"old_value" : str(old_instance[key].get('id')), "new_value" : str(new_instance[key].get('id'))}
                 continue

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from time_tracking.models.release import Release
 from django.db.models import Max, Min
 from time_tracking.models.time_tracking import TimeTracking
+from user.serializers import ReadSortUserSerializer
 
 
 class WriteReleaseSerializer(serializers.ModelSerializer):
@@ -33,8 +34,39 @@ class WriteReleaseSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(error_lst)
         return data
     
-class ReadReleaseSerializer(serializers.ModelSerializer):
+class ReadSortReleaseSerailizer(serializers.ModelSerializer):
+    class Meta:
+        model = Release
+        exclude = ['is_deleted', 'updated_by', 'created_by']
+
+class ReadDetailReleaseSerializer(ReadSortReleaseSerailizer):
+
+    created_by = ReadSortUserSerializer(read_only= True)
+    updated_by = ReadSortUserSerializer(read_only= True)
     
     class Meta:
         model = Release
-        fields = '__all__'
+        exclude = ['is_deleted']
+
+class RecycleReleaseSerializer(serializers.ModelSerializer):
+    
+    ids = serializers.ListField(child = serializers.UUIDField())
+    
+    class Meta:
+        model = Release
+        fields = ['ids']
+    
+    def validate_ids(self, ids):
+
+        if not isinstance(ids, list):
+            raise serializers.ValidationError("ids must be a list")
+        instance_lst = self.Meta.model.objects.filter(id__in = ids, is_deleted= True)
+        validated_ids = instance_lst.values_list('id', flat = True)
+        
+        error_ids = []
+        for id in ids : 
+            if id not in validated_ids: 
+                error_ids.append("id {} is not exist or is not deleted".format(id))
+        if error_ids:
+            raise serializers.ValidationError(error_ids)
+        return instance_lst

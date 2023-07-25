@@ -39,7 +39,7 @@ class BaseViewRecycle(BulkActionBaseModelViewSet):
             instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, url_path='recycle')
+    @action(detail=False, url_path='recycle', methods = ['get'])
     def get_item_deleted(self, request):
         queryset = self.filter_queryset(self.get_queryset())
 
@@ -50,9 +50,14 @@ class BaseViewRecycle(BulkActionBaseModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, url_path='recycle', methods=['put'])
-    def restore(self, request, pk):
-        instance = self.get_object()
-        instance.is_deleted = False
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    @action(detail=False, url_path='undo', methods = ['post'])
+    def restore(self, request):
+        serializer = self.get_serializer(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        instance_lst = serializer.validated_data.get('ids')
+        [setattr(instance, 'is_deleted', False) for instance in instance_lst]
+        instance_lst.bulk_update(instance_lst, ['is_deleted'])
+        
+        serializer_return = self.get_serializer(instance_lst, is_get = True, many = True)
+        
+        return Response(serializer_return.data, status= status.HTTP_200_OK)

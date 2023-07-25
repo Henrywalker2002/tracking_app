@@ -1,7 +1,7 @@
 from base.views import BulkActionBaseModelViewSet
-from permissions.serializers import (WriteRoleSerializer, ReadRoleDetailSerializer, PermissionSerializer, 
-                                     ReadRoleSummarySerializer, BulkDeteleRoleSerializer, 
-                                     BulkDetelePermissionSerializer, UpdatePermissionOfRoleSerializer)
+from permissions.serializers.role import (WriteRoleSerializer, ReadRoleDetailSerializer, 
+                                     ReadRoleSummarySerializer, BulkDeteleRoleSerializer, UpdatePermissionOfRoleSerializer)
+from permissions.serializers.permission import (PermissionSerializer, BulkDetelePermissionSerializer, ReadPermissionSerializer)
 from .models import Role, Permission
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -17,26 +17,18 @@ class RoleModelViewSet(BulkActionBaseModelViewSet):
     serializer_class = {"create": WriteRoleSerializer, "update": WriteRoleSerializer, "partial_update": WriteRoleSerializer,
                         "bulk_delete": BulkDeteleRoleSerializer, 'add_permission' : UpdatePermissionOfRoleSerializer, 
                         "delete_permission" : UpdatePermissionOfRoleSerializer , "default": ReadRoleSummarySerializer, 
-                        "retrieve" : ReadRoleDetailSerializer}
+                        "retrieve" : ReadRoleDetailSerializer, "list" : ReadRoleDetailSerializer}
 
     queryset = Role.objects.all()
     permission_classes = [RolePermission]
     search_fields = ['friendly_name', 'code_name']
-    filterset_fields = ['code_name']
+    filterset_fields = ['code_name', 'created_by']
     
     def get_queryset(self):
         if self.action == "list":
             return self.queryset.prefetch_related('permission')
         return super().get_queryset()
     
-    
-    @query_debugger    
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-    
-    @query_debugger
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
 
     @action(detail= True, url_path= 'add-permission', methods= ['patch'])
     def add_permission(self, request, pk):
@@ -53,7 +45,8 @@ class RoleModelViewSet(BulkActionBaseModelViewSet):
         
 class PermissionModelViewSet(BulkActionBaseModelViewSet):
 
-    serializer_class = {"bulk_delete": BulkDetelePermissionSerializer, "default": PermissionSerializer}
+    serializer_class = {"bulk_delete": BulkDetelePermissionSerializer, "default": PermissionSerializer, 
+                        "retrieve" : ReadPermissionSerializer, "list" : ReadPermissionSerializer}
     
     queryset = Permission.objects.all()
     permission_classes = [RolePermission]

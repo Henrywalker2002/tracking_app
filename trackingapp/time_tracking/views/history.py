@@ -17,11 +17,5 @@ class HistoryViewOnly(GenericViewSet, mixins.RetrieveModelMixin, mixins.ListMode
             return self.serializer_class[self.action]
         return self.serializer_class['default']
     
-    def list(self, request, *args, **kwargs):
-        param = request.GET 
-        if 'time_tracking_id' not in param.keys():
-            return response.Response({"detail" : "Not Found"}, status= status.HTTP_404_NOT_FOUND)
-        return super().list(request, *args, **kwargs)
-    
     
     

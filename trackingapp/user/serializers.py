@@ -6,20 +6,18 @@ from permissions.models import Role
 from django.db import transaction
 from functools import reduce
 import logging
-from trackingapp.custom_middleware import get_current_request_id
-from permissions.serializers import ReadRoleSummarySerializer
+from trackingapp.custom_middleware import get_current_request_id 
+from permissions.serializers.role import ReadRoleSummarySerializer
 
 
 class CreateUserModelSerializer(serializers.ModelSerializer):
 
-    password = serializers.CharField(write_only=True)
     roles = serializers.PrimaryKeyRelatedField(required= False, queryset = Role.objects.all(), many = True)
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'password',
-                  'first_name', 'last_name', 'phone', 'roles']
-
+        fields = ['id', 'email', 'first_name', 'last_name', 'phone', 'roles', 'is_active']
+ 
     def validate_phone(self, phone):
         regex_phone = "^(0|\+84)\d{9}$"
         if not re.match(regex_phone, phone):
@@ -92,11 +90,23 @@ class ReadUserSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name',
-                  'last_name', 'full_name', 'phone', "roles"]
+                  'last_name', 'full_name', 'phone', "roles", "is_active"]
         
 class ReadUserDetailSerializer(ReadUserSummarySerializer):
     
     roles = ReadRoleSummarySerializer(many= True, read_only= True)
+    
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['permission'] = permission_code_names = reduce(lambda prev, curr: prev | set(
+                    curr.permission.all().values_list('code_name', flat=True)), instance.roles.all(), set())
+        return ret
+
+class ReadSortUserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'full_name']    
 
 class LoginSerializer(serializers.Serializer):
     
@@ -132,7 +142,7 @@ class ResetPassword(ForgotPasswordSerializer):
     password = serializers.CharField()
     
     def validate_code(self, code):
-        if not re.match("^\d{6}$", code):
+        if len(code) != 6:
             raise serializers.ValidationError("code is not valid")
         return code
     

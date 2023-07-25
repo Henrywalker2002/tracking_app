@@ -6,15 +6,17 @@ from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.serializers.time_tracking import ReadTimeTrackingSummarySerializer
 
 
-class ReadNotificationSerializer(serializers.ModelSerializer):
-        
+class ReadSummaryNotificationSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Notification
-        fields = '__all__'
+        exclude = ['created_by', 'updated_by']
+
+class ReadDetailNotificationSerializer(ReadSummaryNotificationSerializer):
         
     def to_representation(self, instance):
         """
-        Custom to view all history instead of history id 
+        Custom to view all history, release 
         """
         ret = super().to_representation(instance)
         if ret.get('type') == "TIME_TRACKING_HISTORY":

@@ -21,6 +21,7 @@ class BaseModel(models.Model):
         abstract = True
     
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.updated_by = get_current_user()
+        if self.modified_at:
+            self.updated_by = get_current_user()
         return super().save(force_insert, force_update, using, update_fields)
     

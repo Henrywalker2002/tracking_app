@@ -1,8 +1,8 @@
 from time_tracking.models.time_tracking import TimeTracking
 from rest_framework import serializers
 from base.serializers import BulkDeleteSerializer
-from time_tracking.serializers.release import ReadReleaseSerializer
-from user.serializers import ReadUserSummarySerializer
+from time_tracking.serializers.release import ReadSortReleaseSerailizer
+from user.serializers import ReadSortUserSerializer
 
 class WriteTimeTrackingSerializer(serializers.ModelSerializer):
     
@@ -29,19 +29,44 @@ class WriteTimeTrackingSerializer(serializers.ModelSerializer):
     
 class ReadTimeTrackingSummarySerializer(serializers.ModelSerializer):
     
-    user = serializers.SlugRelatedField(read_only= True, slug_field= "email")
-    release = serializers.SlugRelatedField(read_only= True, slug_field= "release")
+    user = ReadSortUserSerializer(read_only= True)
+    release = ReadSortReleaseSerailizer(read_only= True)
+    created_by = ReadSortUserSerializer(read_only= True)
+    updated_by = ReadSortUserSerializer(read_only= True)
     
     class Meta:
         model = TimeTracking
-        fields = '__all__'
+        exclude = ['is_deleted']
         
 class ReadTimeTrackingDetailSerializer(ReadTimeTrackingSummarySerializer):
     
-    user = ReadUserSummarySerializer(read_only= True)
-    release = ReadReleaseSerializer(read_only= True)
+    user = ReadSortUserSerializer(read_only= True)
+    release = ReadSortReleaseSerailizer(read_only= True)
     
 class BulkDeleteTimeTrackingSerializer(BulkDeleteSerializer):
     class Meta:
         model = TimeTracking
         fields = ['ids']
+
+class RecycleTimeTrackingSerializer(serializers.ModelSerializer):
+    
+    ids = serializers.ListField(child = serializers.UUIDField())
+    
+    class Meta:
+        model = TimeTracking
+        fields = ['ids']
+    
+    def validate_ids(self, ids):
+
+        if not isinstance(ids, list):
+            raise serializers.ValidationError("ids must be a list")
+        instance_lst = self.Meta.model.objects.filter(id__in = ids, is_deleted= True)
+        validated_ids = instance_lst.values_list('id', flat = True)
+        
+        error_ids = []
+        for id in ids : 
+            if id not in validated_ids: 
+                error_ids.append("id {} is not exist or is not deleted".format(id))
+        if error_ids:
+            raise serializers.ValidationError(error_ids)
+        return instance_lst

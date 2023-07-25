@@ -23,7 +23,7 @@ class StatusTimeTracking(models.TextChoices):
 class TimeTracking(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     release = models.ForeignKey(Release, on_delete=models.CASCADE, null=False)
-    task_id = models.CharField(null=False, max_length=128)
+    task_id = models.CharField(null=False, max_length=128, unique= True)
     task_link = models.CharField(max_length=512)
     start_time = models.DateTimeField(null=False, default=datetime.now)
     end_time = models.DateTimeField(null=False)
@@ -32,10 +32,6 @@ class TimeTracking(BaseModel):
     description = models.TextField(null=True)
     note = models.TextField(null=True)
     is_deleted = models.BooleanField(null=False, default=False)
-    
-    @cached_property
-    def release_name(self):
-        return self.release.release
 
     def __str__(self):
         return str(self.id)

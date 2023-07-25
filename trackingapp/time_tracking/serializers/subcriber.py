@@ -2,18 +2,19 @@ from rest_framework import serializers
 from time_tracking.models.subcriber import Subcriber, SubcriberType
 from time_tracking.models.time_tracking import TimeTracking
 from time_tracking.models.release import Release
-from user.serializers import ReadUserSummarySerializer
+from user.serializers import ReadSortUserSerializer
 from time_tracking.serializers.time_tracking import ReadTimeTrackingSummarySerializer
-from time_tracking.serializers.release import ReadReleaseSerializer
+from time_tracking.serializers.release import ReadSortReleaseSerailizer
 
 class WriteSubcriberSerializer(serializers.ModelSerializer):
     
+    id = serializers.UUIDField(read_only= True)
     time_tracking = serializers.PrimaryKeyRelatedField(required= False, queryset = TimeTracking.objects.all())
     release = serializers.PrimaryKeyRelatedField(required= False, queryset = Release.objects.all())
     
     class Meta:
         model = Subcriber
-        fields = ['user', 'time_tracking', 'release', 'object_type']
+        fields = ['id', 'user', 'time_tracking', 'release', 'object_type']
 
     def validate(self, data):
         type = data.get('object_type')
@@ -37,10 +38,10 @@ class WriteSubcriberSerializer(serializers.ModelSerializer):
     
 class ReadSubcriberSerializer(serializers.ModelSerializer):
     
-    user = ReadUserSummarySerializer(read_only= True)
+    user = ReadSortUserSerializer(read_only= True)
     time_tracking = ReadTimeTrackingSummarySerializer(read_only=True)
-    release = ReadReleaseSerializer(read_only= True)
+    release = ReadSortReleaseSerailizer(read_only= True)
     
     class Meta:
         model = Subcriber
-        fields = '__all__'
+        exclude = ['created_by', 'updated_by']
