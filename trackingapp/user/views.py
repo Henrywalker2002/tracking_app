@@ -36,7 +36,7 @@ class UserModelViewSet(CustomModelViewSetBase):
     permission_classes = [UserPermission]
     authentication_classes = [CustomAuthentication]
     search_fields = ['first_name', 'last_name', 'email']
-    filterset_fields = ['email', 'phone']
+    filterset_fields = ['email', 'phone', 'is_active']
     
     
     @action(methods=['patch'], detail=True, url_path="update-role")
